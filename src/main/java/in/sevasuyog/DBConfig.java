@@ -8,6 +8,10 @@ import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+
 @Configuration
 @EnableTransactionManagement
 public class DBConfig {
@@ -27,5 +31,16 @@ public class DBConfig {
 		HibernateTransactionManager transactionManager = new HibernateTransactionManager();
 		transactionManager.setSessionFactory(sessionFactory().getObject());
 		return transactionManager;
+	}
+	
+	@Bean
+	public ObjectMapper objectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		Hibernate5Module hbm = new Hibernate5Module();
+		hbm.disable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION);
+		hbm.enable(Hibernate5Module.Feature.SERIALIZE_IDENTIFIER_FOR_LAZY_NOT_LOADED_OBJECTS);
+		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		objectMapper.registerModule(hbm);
+		return objectMapper;
 	}
 }

@@ -16,7 +16,6 @@
 	<description>Seva Suyog Web Services</description>
 	<properties>
 		<java.version>15</java.version>
-		<hibernate.version>5.3.7.Final</hibernate.version>
 	</properties>
 	<dependencies>
 		<dependency>

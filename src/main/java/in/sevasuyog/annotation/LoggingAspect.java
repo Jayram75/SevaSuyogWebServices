@@ -22,14 +22,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import in.sevasuyog.util.LogUtil;
-import in.sevasuyog.util.MyObjectMapper;
 
 @Aspect
 @Component
 public class LoggingAspect {
 	@Autowired
 	private LogUtil logUtil;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
 	
 	@Pointcut("execution(@in.sevasuyog.annotation.Logging * *.*(..))")
     void annotatedMethod() {}
@@ -76,7 +80,7 @@ public class LoggingAspect {
 		}
 		
 		String methodName = obj.getClass().getName().split("\\$")[0] + "." + method.getName();
-		String message = new MyObjectMapper().writeValueAsString(args);
+		String message = objectMapper.writeValueAsString(args);
 		logUtil.info(message, methodName);
 	}
 }
