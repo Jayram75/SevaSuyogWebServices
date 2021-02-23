@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import in.sevasuyog.annotation.Logging;
-import in.sevasuyog.annotation.SecureCookie;
 import in.sevasuyog.database.CommonDB;
 import in.sevasuyog.model.Greeting;
 import in.sevasuyog.util.CommonUtil;
@@ -22,7 +22,6 @@ import io.swagger.annotations.Api;
 import springfox.documentation.annotations.ApiIgnore;
 
 @Logging
-@SecureCookie
 @RestController
 @RequestMapping(value = "/")
 @Api
@@ -37,7 +36,9 @@ public class MyController {
 	private CommonUtil commonUtil;
 	
 	@GetMapping("/greeting")
-	public Greeting greeting(HttpServletResponse response, 
+	public Greeting greeting(
+	        HttpServletRequest request, 
+	        HttpServletResponse response,
 			@RequestParam(value = "name", defaultValue = "World") String name,
 			@ApiIgnore @CookieValue(value="sessionId",required = false) String sessionId,
 			@ApiIgnore @CookieValue(value="sessionId2",required = false) String sessionId2,
@@ -60,7 +61,7 @@ public class MyController {
 	}
 	
 	@GetMapping("/greetings")
-	public List<Greeting> greetings(HttpServletResponse response,
+	public List<Greeting> greetings(HttpServletRequest request, HttpServletResponse response,
 			@ApiIgnore @CookieValue(value="sessionId",required = false) String sessionId,
 			@ApiIgnore @CookieValue(value="sessionId2",required = false) String sessionId2,
 			@ApiIgnore @CookieValue(value="sessionId3",required = false) String sessionId3,
@@ -68,6 +69,8 @@ public class MyController {
 		System.out.println(sessionId + ", " + sessionId2 + ", " + sessionId3 + ", " + sessionId4);
 		List<Greeting> greetings = commonDB.fetchAll(Greeting.class);
 		System.out.println(commonUtil.<List<Greeting>>fromJSON(commonUtil.toJSON(greetings)));
+		
+		System.out.println(request.getHeader("User-Agent"));
 		
 		response.addCookie(new Cookie("sessionId", "xyz"));
 		Cookie c2 = new Cookie("sessionId2", "xy2z");
