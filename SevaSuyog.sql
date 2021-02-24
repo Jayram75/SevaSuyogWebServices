@@ -48,6 +48,34 @@ LOCK TABLES `address` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `attribute`
+--
+
+DROP TABLE IF EXISTS `attribute`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `attribute` (
+  `ID` smallint(6) NOT NULL AUTO_INCREMENT,
+  `GUID` varchar(3) NOT NULL,
+  `Attribute` varchar(50) NOT NULL,
+  `PossibleValues` varchar(150) NOT NULL,
+  `DefaultValue` varchar(50) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_attribute` (`GUID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `attribute`
+--
+
+LOCK TABLES `attribute` WRITE;
+/*!40000 ALTER TABLE `attribute` DISABLE KEYS */;
+INSERT INTO `attribute` VALUES (1,'EE','Is Employee','true/false','false'),(2,'ER','Is Employer','true/false','false'),(3,'AD','Is Admin','true/false','false'),(4,'V','Is Verified','true/false','false'),(5,'AC','Is Active','true/false','true'),(6,'AV','Is Available','true/false','true');
+/*!40000 ALTER TABLE `attribute` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `bhasha`
 --
 
@@ -359,11 +387,6 @@ CREATE TABLE `user` (
   `GUID` varchar(50) NOT NULL,
   `UserName` varchar(50) NOT NULL,
   `Password` varchar(50) NOT NULL,
-  `IsEmployee` tinyint(1) NOT NULL DEFAULT 0,
-  `IsEMployer` tinyint(1) NOT NULL DEFAULT 0,
-  `IsAdmin` tinyint(1) NOT NULL DEFAULT 0,
-  `IsVerified` tinyint(1) NOT NULL DEFAULT 0,
-  `IsActive` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -375,6 +398,35 @@ CREATE TABLE `user` (
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `userattribute`
+--
+
+DROP TABLE IF EXISTS `userattribute`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `userattribute` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `UserID` bigint(20) NOT NULL,
+  `AttributeID` smallint(6) NOT NULL,
+  `AttributeValue` varchar(50) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_userattribute` (`UserID`,`AttributeID`),
+  KEY `fk_userattribute_bhasha` (`AttributeID`),
+  CONSTRAINT `fk_UserAttribute_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_userattribute_bhasha` FOREIGN KEY (`AttributeID`) REFERENCES `attribute` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `userattribute`
+--
+
+LOCK TABLES `userattribute` WRITE;
+/*!40000 ALTER TABLE `userattribute` DISABLE KEYS */;
+/*!40000 ALTER TABLE `userattribute` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -506,4 +558,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-02-23  9:23:24
+-- Dump completed on 2021-02-24 20:26:49
