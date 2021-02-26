@@ -24,18 +24,20 @@ DROP TABLE IF EXISTS `address`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `address` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `AddressType` enum('LOCAL','PERMANENT','WORK') NOT NULL DEFAULT 'LOCAL',
+  `AddressType` enum('LOCAL','PERMANENT','WORK','TASK') NOT NULL DEFAULT 'LOCAL',
   `UserID` bigint(20) NOT NULL,
   `Address` varchar(150) NOT NULL,
   `LandMark` varchar(50) DEFAULT NULL,
   `LocalityID` mediumint(9) NOT NULL,
+  `Label` varchar(30) DEFAULT NULL,
+  `GUID` varchar(8) NOT NULL,
   PRIMARY KEY (`ID`),
-  UNIQUE KEY `u_address` (`AddressType`,`UserID`),
+  UNIQUE KEY `u_address` (`GUID`),
   KEY `fk_Address_user` (`UserID`),
   KEY `fk_Address_locality` (`LocalityID`),
   CONSTRAINT `fk_Address_locality` FOREIGN KEY (`LocalityID`) REFERENCES `locality` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_Address_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -84,10 +86,11 @@ DROP TABLE IF EXISTS `bhasha`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `bhasha` (
   `ID` tinyint(4) NOT NULL AUTO_INCREMENT,
+  `GUID` varchar(3) NOT NULL,
   `Bhasha` varchar(20) NOT NULL,
   PRIMARY KEY (`ID`),
-  UNIQUE KEY `u_bhasha` (`Bhasha`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `u_bhasha` (`GUID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -185,6 +188,58 @@ LOCK TABLES `communication` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `favoriteemployee`
+--
+
+DROP TABLE IF EXISTS `favoriteemployee`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `favoriteemployee` (
+  `EmployerID` bigint(20) NOT NULL,
+  `EmployeeID` bigint(20) NOT NULL,
+  UNIQUE KEY `u_favoriteemployee` (`EmployerID`,`EmployeeID`),
+  KEY `fk_FavoriteEmployee_employee` (`EmployeeID`),
+  CONSTRAINT `fk_FavoriteEmployee_employee` FOREIGN KEY (`EmployeeID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_FavoriteEmployee_employer` FOREIGN KEY (`EmployerID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `favoriteemployee`
+--
+
+LOCK TABLES `favoriteemployee` WRITE;
+/*!40000 ALTER TABLE `favoriteemployee` DISABLE KEYS */;
+/*!40000 ALTER TABLE `favoriteemployee` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `fieldtype`
+--
+
+DROP TABLE IF EXISTS `fieldtype`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fieldtype` (
+  `ID` tinyint(4) NOT NULL AUTO_INCREMENT,
+  `GUID` varchar(4) NOT NULL,
+  `TableName` varchar(50) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_fieldtype` (`GUID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `fieldtype`
+--
+
+LOCK TABLES `fieldtype` WRITE;
+/*!40000 ALTER TABLE `fieldtype` DISABLE KEYS */;
+INSERT INTO `fieldtype` VALUES (1,'ST','IndianState'),(2,'CT','City'),(3,'LCL','Locality'),(4,'PR','Profession'),(5,'SK','Skill'),(6,'BH','Bhasha');
+/*!40000 ALTER TABLE `fieldtype` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `indianstate`
 --
 
@@ -197,7 +252,7 @@ CREATE TABLE `indianstate` (
   `IndianState` varchar(50) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `u_indianstate` (`GUID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -206,6 +261,7 @@ CREATE TABLE `indianstate` (
 
 LOCK TABLES `indianstate` WRITE;
 /*!40000 ALTER TABLE `indianstate` DISABLE KEYS */;
+INSERT INTO `indianstate` VALUES (1,'BR','બિહાર'),(2,'UP','Uttar Pradesh'),(3,'MP','Madhya Pradesh');
 /*!40000 ALTER TABLE `indianstate` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -262,6 +318,34 @@ CREATE TABLE `location` (
 LOCK TABLES `location` WRITE;
 /*!40000 ALTER TABLE `location` DISABLE KEYS */;
 /*!40000 ALTER TABLE `location` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `objectalias`
+--
+
+DROP TABLE IF EXISTS `objectalias`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `objectalias` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `FieldTypeID` tinyint(4) NOT NULL,
+  `ObjectGUID` varchar(8) NOT NULL,
+  `ObjectAlias` varchar(50) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `i_alias_object_guid` (`ObjectGUID`),
+  KEY `fk_objectalias_fieldtype` (`FieldTypeID`),
+  CONSTRAINT `fk_objectalias_fieldtype` FOREIGN KEY (`FieldTypeID`) REFERENCES `fieldtype` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `objectalias`
+--
+
+LOCK TABLES `objectalias` WRITE;
+/*!40000 ALTER TABLE `objectalias` DISABLE KEYS */;
+/*!40000 ALTER TABLE `objectalias` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -357,13 +441,15 @@ DROP TABLE IF EXISTS `suggestionbyuser`;
 CREATE TABLE `suggestionbyuser` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `UserID` bigint(20) NOT NULL,
-  `FieldType` enum('CITY','LOCALITY','PROFESSION','SKILL') NOT NULL,
   `FieldValue` varchar(50) NOT NULL,
   `IsResolved` tinyint(1) NOT NULL DEFAULT 0,
+  `FieldTypeID` tinyint(4) NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `fk_SuggestionByUser_user` (`UserID`),
-  CONSTRAINT `fk_SuggestionByUser_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_suggestionbyuser_fieldtype` (`FieldTypeID`),
+  CONSTRAINT `fk_SuggestionByUser_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_suggestionbyuser_fieldtype` FOREIGN KEY (`FieldTypeID`) REFERENCES `fieldtype` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -373,6 +459,98 @@ CREATE TABLE `suggestionbyuser` (
 LOCK TABLES `suggestionbyuser` WRITE;
 /*!40000 ALTER TABLE `suggestionbyuser` DISABLE KEYS */;
 /*!40000 ALTER TABLE `suggestionbyuser` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `task`
+--
+
+DROP TABLE IF EXISTS `task`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `task` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `GUID` varchar(8) NOT NULL,
+  `TaskName` varchar(50) NOT NULL,
+  `Detail` varchar(150) DEFAULT NULL,
+  `ProfessionID` smallint(6) NOT NULL,
+  `EmployeeID` bigint(20) DEFAULT NULL,
+  `EmployerAddressID` bigint(20) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_task` (`GUID`),
+  KEY `fk_Task_profession` (`ProfessionID`),
+  KEY `fk_task_employee` (`EmployeeID`),
+  KEY `fk_task_address` (`EmployerAddressID`),
+  CONSTRAINT `fk_Task_profession` FOREIGN KEY (`ProfessionID`) REFERENCES `profession` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_task_address` FOREIGN KEY (`EmployerAddressID`) REFERENCES `address` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_task_employee` FOREIGN KEY (`EmployeeID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `task`
+--
+
+LOCK TABLES `task` WRITE;
+/*!40000 ALTER TABLE `task` DISABLE KEYS */;
+/*!40000 ALTER TABLE `task` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `taskapplication`
+--
+
+DROP TABLE IF EXISTS `taskapplication`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `taskapplication` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `GUID` varchar(8) NOT NULL,
+  `TaskID` bigint(20) NOT NULL,
+  `EmployeeID` bigint(20) NOT NULL,
+  `IsRejected` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_taskapplication` (`GUID`),
+  KEY `fk_TaskApplication_task` (`TaskID`),
+  KEY `fk_TaskApplication_user` (`EmployeeID`),
+  CONSTRAINT `fk_TaskApplication_task` FOREIGN KEY (`TaskID`) REFERENCES `task` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_TaskApplication_user` FOREIGN KEY (`EmployeeID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `taskapplication`
+--
+
+LOCK TABLES `taskapplication` WRITE;
+/*!40000 ALTER TABLE `taskapplication` DISABLE KEYS */;
+/*!40000 ALTER TABLE `taskapplication` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `taskskill`
+--
+
+DROP TABLE IF EXISTS `taskskill`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `taskskill` (
+  `TaskID` bigint(20) NOT NULL,
+  `SkillID` smallint(6) NOT NULL,
+  UNIQUE KEY `u_taskskill` (`TaskID`,`SkillID`),
+  KEY `fk_TaskSkill_skill` (`SkillID`),
+  CONSTRAINT `fk_TaskSkill_skill` FOREIGN KEY (`SkillID`) REFERENCES `skill` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_TaskSkill_task` FOREIGN KEY (`TaskID`) REFERENCES `task` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `taskskill`
+--
+
+LOCK TABLES `taskskill` WRITE;
+/*!40000 ALTER TABLE `taskskill` DISABLE KEYS */;
+/*!40000 ALTER TABLE `taskskill` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -558,4 +736,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-02-24 20:26:49
+-- Dump completed on 2021-02-26 15:08:57
