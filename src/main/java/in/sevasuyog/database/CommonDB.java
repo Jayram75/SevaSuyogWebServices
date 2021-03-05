@@ -65,7 +65,7 @@ public class CommonDB {
 		sessionFactory.getCurrentSession().delete(object);
 	}
 	
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = true)
 	public <T> List<T> fetchAll(Class<T> class2) {
 		CriteriaBuilder builder = sessionFactory.getCriteriaBuilder();
 	    CriteriaQuery<T> criteria = builder.createQuery(class2);
@@ -77,7 +77,7 @@ public class CommonDB {
 	public <T> Object getFromGUID(String guid, Class<T> type) {
 		Query<T> q = sessionFactory.getCurrentSession().createQuery("select o from " + type.getSimpleName() + " o "
 				+ "where o.guid = :guid", type);
-		q.setParameter("guid", StringType.INSTANCE);
+		q.setParameter("guid", guid, StringType.INSTANCE);
 		return q.uniqueResult();
 	}
 }

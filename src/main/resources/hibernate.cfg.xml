@@ -9,9 +9,9 @@
 		<property name="hibernate.connection.autoReconnectForPools">true</property>
 		<property name="hibernate.connection.is-connection-validation-required">true</property>
 		<property name="hibernate.connection.password">secret</property>
-		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/test</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/SevaSuyog</property>
 		<property name="hibernate.connection.username">root</property>
-		<property name="hibernate.default_catalog">test</property>
+		<property name="hibernate.default_catalog">SevaSuyog</property>
 		<property name="hibernate.dialect.storage_engine">innodb</property>
 		<property name="hibernate.search.autoregister_listeners">false</property>
 		<property name="hibernate.show_sql">false</property>

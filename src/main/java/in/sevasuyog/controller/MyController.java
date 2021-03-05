@@ -18,6 +18,7 @@ import in.sevasuyog.annotation.Logging;
 import in.sevasuyog.database.CommonDB;
 import in.sevasuyog.model.Greeting;
 import in.sevasuyog.util.CommonUtil;
+import in.sevasuyog.util.MyPasswordEncoder;
 import io.swagger.annotations.Api;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -34,6 +35,9 @@ public class MyController {
 	
 	@Autowired
 	private CommonUtil commonUtil;
+	
+	@Autowired
+	private MyPasswordEncoder encoder;
 	
 	@GetMapping("/greeting")
 	public Greeting greeting(
@@ -83,6 +87,11 @@ public class MyController {
 		c4.setSecure(true);
 		c4.setHttpOnly(true);
 		response.addCookie(c4);
+		
+		String ep = encoder.encode("password");
+		System.out.println(ep);
+		System.out.println(encoder.matches("password", ep));
+		System.out.println(encoder.matches("password1", ep));
 		
 		return greetings; 
 	}
