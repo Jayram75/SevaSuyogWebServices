@@ -19,7 +19,7 @@ public class SevaRole {
 	@JsonIgnore
     private Long id;
 	private String guid;
-	private String saveRole;
+	private String sevaRole;
 	
 	public Long getId() {
 		return id;
@@ -33,10 +33,10 @@ public class SevaRole {
 	public void setGuid(String guid) {
 		this.guid = guid;
 	}
-	public String getSaveRole() {
-		return saveRole;
+	public String getSevaRole() {
+		return sevaRole;
 	}
-	public void setSaveRole(String saveRole) {
-		this.saveRole = saveRole;
+	public void setSevaRole(String sevaRole) {
+		this.sevaRole = sevaRole;
 	}
 }

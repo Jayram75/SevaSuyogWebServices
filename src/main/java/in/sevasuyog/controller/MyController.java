@@ -131,7 +131,7 @@ public class MyController {
 				}
 				
 				for(UserRole ur: userRoles) {
-					if(ur.getSevaRoleId().longValue() == sevaRole.getId().longValue()) {
+					if(ur.getRoleId().longValue() == sevaRole.getId().longValue()) {
 						userRole = ur;
 						break;
 					}

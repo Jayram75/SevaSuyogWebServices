@@ -22,7 +22,7 @@ public class UserRole {
     private Long id;
 	private String guid;
 	private Long userId;
-	private Long sevaRoleId;
+	private Long roleId;
 	@ManyToOne
     @JoinColumn(name="UserID")
     private User user;
@@ -45,16 +45,16 @@ public class UserRole {
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-	public Long getSevaRoleId() {
-		return sevaRoleId;
-	}
-	public void setSevaRoleId(Long sevaRoleId) {
-		this.sevaRoleId = sevaRoleId;
-	}
 	public User getUser() {
 		return user;
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+	public Long getRoleId() {
+		return roleId;
+	}
+	public void setRoleId(Long roleId) {
+		this.roleId = roleId;
 	}
 }
