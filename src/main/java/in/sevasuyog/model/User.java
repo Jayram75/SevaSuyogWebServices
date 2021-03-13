@@ -40,6 +40,18 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy="user", fetch = FetchType.EAGER)
     private Set<UserAttribute> userAttributes;
+    
+    @JsonIgnore
+    @OneToMany(mappedBy="user", fetch = FetchType.EAGER)
+    private Set<UserRole> userRoles;
+
+	public Set<UserRole> getUserRoles() {
+		return userRoles;
+	}
+
+	public void setUserRoles(Set<UserRole> userRoles) {
+		this.userRoles = userRoles;
+	}
 
 	public Set<UserAttribute> getUserAttributes() {
 		return userAttributes;

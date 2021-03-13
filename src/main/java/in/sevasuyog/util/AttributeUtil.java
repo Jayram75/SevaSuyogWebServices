@@ -68,6 +68,4 @@ public class AttributeUtil {
 		if(string.trim().equalsIgnoreCase("false")) return false;
 		return null;
 	}
-	
-	
 }

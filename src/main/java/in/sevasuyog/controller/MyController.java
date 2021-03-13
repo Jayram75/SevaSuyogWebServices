@@ -1,6 +1,7 @@
 package in.sevasuyog.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.NoResultException;
 import javax.servlet.http.Cookie;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import in.sevasuyog.annotation.Logging;
 import in.sevasuyog.database.CommonDB;
 import in.sevasuyog.model.Greeting;
+import in.sevasuyog.model.SevaRole;
 import in.sevasuyog.model.User;
+import in.sevasuyog.model.UserRole;
 import in.sevasuyog.model.enums.AttributeName;
 import in.sevasuyog.model.enums.ResponseMessage;
 import in.sevasuyog.model.request.LoginRequest;
@@ -29,6 +32,7 @@ import in.sevasuyog.service.UserService;
 import in.sevasuyog.util.AttributeUtil;
 import in.sevasuyog.util.CommonUtil;
 import in.sevasuyog.util.MyPasswordEncoder;
+import in.sevasuyog.util.SevaRoleUtil;
 import io.swagger.annotations.Api;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -50,6 +54,9 @@ public class MyController {
 	
 	@Autowired
 	private AttributeUtil attributeUtil;
+
+	@Autowired
+	private SevaRoleUtil sevaRoleUtil; 
 	
 	@Autowired
 	private CommonUtil commonUtil;
@@ -75,6 +82,7 @@ public class MyController {
 	@PostMapping("/refreshApp") 
 	public String refreshApp() {
 		attributeUtil.refresh();
+		sevaRoleUtil.refresh();
 		return ResponseMessage.SUCCESSFUL.name();
 		
 	}
@@ -102,7 +110,41 @@ public class MyController {
 				loginResponse.setMessage(ResponseMessage.NOT_ACTIVE);
 				return loginResponse;
 			}
-			// TODO Determine Role
+			
+			//Determine Role
+			Set<UserRole> userRoles = user.getUserRoles();
+			if(userRoles == null || userRoles.isEmpty()) {
+				throw new UnsupportedOperationException(
+					String.format("The user with username \"%s\" doesn't have any role assigned!", loginRequest.getUsername())
+				);
+			}
+			
+			UserRole userRole = null;
+			
+			if(userRoles.size() == 1) {
+				userRole = userRoles.iterator().next();
+			} else {
+				SevaRole sevaRole = sevaRoleUtil.getSevaRole(loginRequest.getRoleGUID());
+				if(sevaRole == null) {
+					loginResponse.setMessage(ResponseMessage.MULTIPLE_ROLES_EXIST);
+					return loginResponse;
+				}
+				
+				for(UserRole ur: userRoles) {
+					if(ur.getSevaRoleId().longValue() == sevaRole.getId().longValue()) {
+						userRole = ur;
+						break;
+					}
+				}
+				
+				if(userRole == null) {
+					loginResponse.setMessage(ResponseMessage.INCORRECT_ROLE);
+					return loginResponse;
+				}
+			}
+			
+			//TODO Create or update user session
+			
 			loginResponse.setMessage(ResponseMessage.SUCCESSFUL);
 			loginResponse.setUser(user);
 		} catch (NoResultException e) {

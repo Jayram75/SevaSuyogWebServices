@@ -7,13 +7,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import in.sevasuyog.util.AttributeUtil;
+import in.sevasuyog.util.SevaRoleUtil;
 
 @SpringBootApplication
 public class Application {
-	
+	@Autowired
+	private AttributeUtil attributeUtil;
 	
 	@Autowired
-	private AttributeUtil attributes;
+	private SevaRoleUtil sevaRoleUtil; 
 	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
@@ -21,6 +23,7 @@ public class Application {
 	
 	@PostConstruct
 	public void init() {
-		attributes.init();
+		attributeUtil.init();
+		sevaRoleUtil.init();
 	}
 }
