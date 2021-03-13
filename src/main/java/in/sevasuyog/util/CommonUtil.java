@@ -1,5 +1,7 @@
 package in.sevasuyog.util;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +27,13 @@ public class CommonUtil {
 		} catch (Exception e) {}
 		
 		return null;
+	}
+
+	public <T> T getSingleElement(List<T> list) {
+		try {
+			return (T) list.get(0);
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 }

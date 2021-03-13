@@ -1,16 +1,26 @@
 package in.sevasuyog;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import in.sevasuyog.util.AttributeUtil;
+
 @SpringBootApplication
 public class Application {
-	private static final Logger LOGGER = LogManager.getLogger(Application.class);
+	
+	
+	@Autowired
+	private AttributeUtil attributes;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
-		LOGGER.info("Seva Suyog WebServices App is started!");
+	}
+	
+	@PostConstruct
+	public void init() {
+		attributes.init();
 	}
 }

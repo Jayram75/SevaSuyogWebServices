@@ -23,6 +23,6 @@ public class UserDB {
 		Session session=sessionFactory.getCurrentSession();
 		Query<User> q = session.createQuery(query, User.class);
 		q.setParameter("username", username, StringType.INSTANCE);
-		return (User) q.list().get(0);
+		return q.getSingleResult();
 	}
 }

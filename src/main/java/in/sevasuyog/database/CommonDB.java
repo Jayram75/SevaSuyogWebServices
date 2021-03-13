@@ -3,21 +3,27 @@ package in.sevasuyog.database;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.hibernate.type.StringType;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import in.sevasuyog.util.CommonUtil;
 
 @Service
 public class CommonDB {
 
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	@Autowired
+	private CommonUtil commonUtil;
 
 	@Transactional(readOnly = false)
 	public void saveOrUpdate(Object object) {
@@ -79,6 +85,18 @@ public class CommonDB {
 				+ "where o.guid = :guid", type);
 		q.setParameter("guid", guid, StringType.INSTANCE);
 		return q.uniqueResult();
+	}
+
+	public <T> T getSingleElement(Query<T> q) {
+		return commonUtil.getSingleElement(q.list());
+	}
+
+	public <T> T getSingleResult(Query<T> q) {
+		try {
+			return q.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
 	}
 }
 

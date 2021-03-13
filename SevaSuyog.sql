@@ -73,7 +73,7 @@ CREATE TABLE `attribute` (
 
 LOCK TABLES `attribute` WRITE;
 /*!40000 ALTER TABLE `attribute` DISABLE KEYS */;
-INSERT INTO `attribute` VALUES (1,'EE','Is Employee','true/false','false'),(2,'ER','Is Employer','true/false','false'),(3,'AD','Is Admin','true/false','false'),(4,'V','Is Verified','true/false','false'),(5,'AC','Is Active','true/false','true'),(6,'AV','Is Available','true/false','true');
+INSERT INTO `attribute` VALUES (1,'V','Is Verified','true/false','false'),(2,'AC','Is Active','true/false','true'),(3,'AV','Is Available','true/false','true');
 /*!40000 ALTER TABLE `attribute` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -118,8 +118,12 @@ CREATE TABLE `biodata` (
   `PANNumber` varchar(10) DEFAULT NULL,
   `Photo` blob DEFAULT NULL,
   `UserID` bigint(20) NOT NULL,
+  `CompanyID` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`UserID`),
   UNIQUE KEY `u_biodata` (`UserID`),
-  CONSTRAINT `fk_BioData_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `fk_biodata_company` (`CompanyID`),
+  CONSTRAINT `fk_BioData_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_biodata_company` FOREIGN KEY (`CompanyID`) REFERENCES `company` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -129,6 +133,7 @@ CREATE TABLE `biodata` (
 
 LOCK TABLES `biodata` WRITE;
 /*!40000 ALTER TABLE `biodata` DISABLE KEYS */;
+INSERT INTO `biodata` VALUES ('Jayram Kumar','SINGLE','MALE','1889-10-10','123456789012',NULL,NULL,1,NULL);
 /*!40000 ALTER TABLE `biodata` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -188,6 +193,32 @@ LOCK TABLES `communication` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `company`
+--
+
+DROP TABLE IF EXISTS `company`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `company` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `GUID` varchar(3) NOT NULL,
+  `Company` varchar(50) NOT NULL,
+  `Address` varchar(150) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_company` (`GUID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `company`
+--
+
+LOCK TABLES `company` WRITE;
+/*!40000 ALTER TABLE `company` DISABLE KEYS */;
+/*!40000 ALTER TABLE `company` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `favoriteemployee`
 --
 
@@ -237,6 +268,31 @@ LOCK TABLES `fieldtype` WRITE;
 /*!40000 ALTER TABLE `fieldtype` DISABLE KEYS */;
 INSERT INTO `fieldtype` VALUES (1,'ST','IndianState'),(2,'CT','City'),(3,'LCL','Locality'),(4,'PR','Profession'),(5,'SK','Skill'),(6,'BH','Bhasha');
 /*!40000 ALTER TABLE `fieldtype` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `greeting`
+--
+
+DROP TABLE IF EXISTS `greeting`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `greeting` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `Content` varchar(50) NOT NULL,
+  `Count` int(10) unsigned zerofill NOT NULL DEFAULT 0000000001,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `greeting`
+--
+
+LOCK TABLES `greeting` WRITE;
+/*!40000 ALTER TABLE `greeting` DISABLE KEYS */;
+INSERT INTO `greeting` VALUES (1,'Shyam Sundar',0000000001),(2,'Mohan',0000000002),(3,'Soni Kumari',0000000490);
+/*!40000 ALTER TABLE `greeting` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -407,6 +463,32 @@ LOCK TABLES `qualification` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `sevarole`
+--
+
+DROP TABLE IF EXISTS `sevarole`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sevarole` (
+  `ID` tinyint(4) NOT NULL AUTO_INCREMENT,
+  `GUID` varchar(3) NOT NULL,
+  `SevaRole` varchar(50) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_role` (`GUID`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sevarole`
+--
+
+LOCK TABLES `sevarole` WRITE;
+/*!40000 ALTER TABLE `sevarole` DISABLE KEYS */;
+INSERT INTO `sevarole` VALUES (1,'EE','Employee'),(2,'ER','Employer'),(3,'AD','Admin'),(4,'AV','Advertiser');
+/*!40000 ALTER TABLE `sevarole` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `skill`
 --
 
@@ -562,11 +644,11 @@ DROP TABLE IF EXISTS `user`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `GUID` varchar(50) NOT NULL,
   `UserName` varchar(50) NOT NULL,
-  `Password` varchar(50) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+  `Password` varchar(100) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_user` (`UserName`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -575,6 +657,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'jayram','$2a$10$eI2FmJJ0JjfACqcbTv3JG.ADgJgn6u9kkGY1GsTZWScle2B4u19PO');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -595,7 +678,7 @@ CREATE TABLE `userattribute` (
   KEY `fk_userattribute_bhasha` (`AttributeID`),
   CONSTRAINT `fk_UserAttribute_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_userattribute_bhasha` FOREIGN KEY (`AttributeID`) REFERENCES `attribute` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -604,6 +687,7 @@ CREATE TABLE `userattribute` (
 
 LOCK TABLES `userattribute` WRITE;
 /*!40000 ALTER TABLE `userattribute` DISABLE KEYS */;
+INSERT INTO `userattribute` VALUES (1,1,1,'true');
 /*!40000 ALTER TABLE `userattribute` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -639,6 +723,36 @@ LOCK TABLES `userbhasha` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `userrole`
+--
+
+DROP TABLE IF EXISTS `userrole`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `userrole` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `GUID` varchar(8) NOT NULL,
+  `UserID` bigint(20) NOT NULL,
+  `RoleID` tinyint(4) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_userrole` (`GUID`),
+  KEY `fk_userrole_user` (`UserID`),
+  KEY `fk_userrole_sevarole` (`RoleID`),
+  CONSTRAINT `fk_userrole_sevarole` FOREIGN KEY (`RoleID`) REFERENCES `sevarole` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_userrole_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `userrole`
+--
+
+LOCK TABLES `userrole` WRITE;
+/*!40000 ALTER TABLE `userrole` DISABLE KEYS */;
+/*!40000 ALTER TABLE `userrole` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `usersession`
 --
 
@@ -647,15 +761,15 @@ DROP TABLE IF EXISTS `usersession`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `usersession` (
   `SessionID` varchar(50) NOT NULL,
-  `UserID` bigint(20) DEFAULT NULL,
-  `UserRole` enum('EMPLOYER','EMPLOYEE','ADMIN') DEFAULT NULL,
   `DeviceInfo` varchar(150) NOT NULL,
   `IsExpired` tinyint(1) NOT NULL DEFAULT 0,
   `InsertTS` timestamp NOT NULL DEFAULT current_timestamp(),
   `UpdateTS` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `UserRoleID` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`SessionID`),
-  KEY `fk_usersession_user` (`UserID`),
-  CONSTRAINT `fk_usersession_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  UNIQUE KEY `u_usersession` (`SessionID`),
+  KEY `fk_usersession_userrole` (`UserRoleID`),
+  CONSTRAINT `fk_usersession_userrole` FOREIGN KEY (`UserRoleID`) REFERENCES `userrole` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -736,4 +850,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-02-26 15:08:57
+-- Dump completed on 2021-03-13 12:07:18

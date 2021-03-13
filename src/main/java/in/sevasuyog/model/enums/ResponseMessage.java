@@ -1,0 +1,12 @@
+package in.sevasuyog.model.enums;
+
+public enum ResponseMessage {
+	SUCCESSFUL,
+	INCORRECT_USERNAME,
+	INCORRECT_PASSWORD,
+	INCORRECT_ROLE,
+	MULTIPLE_ROLES_EXIST,
+	NOT_ACTIVE,
+	NOT_VERIFIED,
+	SOMETHING_WENT_WRONG
+}
