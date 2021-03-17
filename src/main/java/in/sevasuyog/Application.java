@@ -4,18 +4,17 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 
 import in.sevasuyog.util.AttributeUtil;
-import in.sevasuyog.util.SevaRoleUtil;
 
 @SpringBootApplication
+@EnableAutoConfiguration(exclude = { HibernateJpaAutoConfiguration.class }) 
 public class Application {
 	@Autowired
 	private AttributeUtil attributeUtil;
-	
-	@Autowired
-	private SevaRoleUtil sevaRoleUtil; 
 	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
@@ -24,6 +23,5 @@ public class Application {
 	@PostConstruct
 	public void init() {
 		attributeUtil.init();
-		sevaRoleUtil.init();
 	}
 }

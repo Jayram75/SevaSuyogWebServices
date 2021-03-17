@@ -1,12 +1,11 @@
 package in.sevasuyog.controller;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.NoResultException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,18 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 import in.sevasuyog.annotation.Logging;
 import in.sevasuyog.database.CommonDB;
 import in.sevasuyog.model.Greeting;
-import in.sevasuyog.model.SevaRole;
 import in.sevasuyog.model.User;
-import in.sevasuyog.model.UserRole;
 import in.sevasuyog.model.enums.AttributeName;
 import in.sevasuyog.model.enums.ResponseMessage;
+import in.sevasuyog.model.enums.Role;
 import in.sevasuyog.model.request.LoginRequest;
 import in.sevasuyog.model.response.LoginResponse;
 import in.sevasuyog.service.UserService;
 import in.sevasuyog.util.AttributeUtil;
 import in.sevasuyog.util.CommonUtil;
 import in.sevasuyog.util.MyPasswordEncoder;
-import in.sevasuyog.util.SevaRoleUtil;
+import in.sevasuyog.util.Strings;
 import io.swagger.annotations.Api;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -54,26 +52,26 @@ public class MyController {
 	
 	@Autowired
 	private AttributeUtil attributeUtil;
-
-	@Autowired
-	private SevaRoleUtil sevaRoleUtil; 
 	
 	@Autowired
 	private CommonUtil commonUtil;
 	
+	@Autowired
+    private HttpSession session;
+	
+	@Autowired
+	private HttpServletRequest request;
+	
+	@Autowired
+	private HttpServletResponse response;
+	
 	@GetMapping("/greetings")
-	public List<Greeting> greetings(HttpServletRequest request, HttpServletResponse response,
-			@ApiIgnore @CookieValue(value="myCookie",required = false) String myCookie) throws Exception {
+	public List<Greeting> greetings(@ApiIgnore @CookieValue(value="myCookie",required = false) String myCookie) throws Exception {
 		List<Greeting> greetings = commonDB.fetchAll(Greeting.class);
 		System.out.println(request.getHeader("User-Agent"));
 		
-		Cookie c = new Cookie("JSESSIONID", "custom_value_of_cookie");
-		c.setHttpOnly(true);
-		response.addCookie(c);
-		
 		request.getHeaderNames().asIterator().forEachRemaining(t -> System.out.println(t + " --> " + request.getHeader(t)));
 
-		request.getSession(true);
 		response.getHeaderNames().forEach(t -> System.out.println(t + " --> " + response.getHeaders(t)));
 		LOGGER.info(commonUtil.toJSON(response.getHeaders("Set-Cookie")));
 		return greetings; 
@@ -81,13 +79,31 @@ public class MyController {
 	
 	@PostMapping("/refreshApp") 
 	public String refreshApp() {
-		attributeUtil.refresh();
-		sevaRoleUtil.refresh();
-		return ResponseMessage.SUCCESSFUL.name();
-		
+		try {
+			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
+				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
+			}
+			attributeUtil.refresh();
+			return ResponseMessage.SUCCESSFUL.name();
+		} catch (Exception e) {
+			LOGGER.error(e);
+			return ResponseMessage.SOMETHING_WENT_WRONG.name();
+		}
 	}
 	
-	@Logging(value = false)
+	@GetMapping("/logoutMe")
+	public String logout() {
+		try {
+			session.invalidate();
+		} catch (IllegalStateException e) {	//Already logged out!
+		} catch (Exception e) {
+			LOGGER.error(e);
+			return ResponseMessage.SOMETHING_WENT_WRONG.name();
+		}
+		return ResponseMessage.SUCCESSFUL.name();
+	}
+	
+	@Logging(value = false) // For not logging the PASSWORD as it is a sensitive information!
 	@PostMapping("/login")
 	public LoginResponse login(@RequestBody LoginRequest loginRequest) {
 		LoginResponse loginResponse = new LoginResponse();
@@ -111,39 +127,7 @@ public class MyController {
 				return loginResponse;
 			}
 			
-			//Determine Role
-			Set<UserRole> userRoles = user.getUserRoles();
-			if(userRoles == null || userRoles.isEmpty()) {
-				throw new UnsupportedOperationException(
-					String.format("The user with username \"%s\" doesn't have any role assigned!", loginRequest.getUsername())
-				);
-			}
-			
-			UserRole userRole = null;
-			
-			if(userRoles.size() == 1) {
-				userRole = userRoles.iterator().next();
-			} else {
-				SevaRole sevaRole = sevaRoleUtil.getSevaRole(loginRequest.getRoleGUID());
-				if(sevaRole == null) {
-					loginResponse.setMessage(ResponseMessage.MULTIPLE_ROLES_EXIST);
-					return loginResponse;
-				}
-				
-				for(UserRole ur: userRoles) {
-					if(ur.getRoleId().longValue() == sevaRole.getId().longValue()) {
-						userRole = ur;
-						break;
-					}
-				}
-				
-				if(userRole == null) {
-					loginResponse.setMessage(ResponseMessage.INCORRECT_ROLE);
-					return loginResponse;
-				}
-			}
-			
-			//TODO Create or update user session
+			session.setAttribute(Strings.USER_ID, user.getId());
 			
 			loginResponse.setMessage(ResponseMessage.SUCCESSFUL);
 			loginResponse.setUser(user);

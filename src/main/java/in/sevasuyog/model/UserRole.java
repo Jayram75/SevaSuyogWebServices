@@ -1,6 +1,8 @@
 package in.sevasuyog.model;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -12,6 +14,8 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import in.sevasuyog.model.enums.Role;
+
 @Entity
 @Table(name = "UserRole")
 @DynamicUpdate(value = true)
@@ -22,7 +26,8 @@ public class UserRole {
     private Long id;
 	private String guid;
 	private Long userId;
-	private Long roleId;
+	@Enumerated(EnumType.STRING)
+	private Role role;
 	@ManyToOne
     @JoinColumn(name="UserID")
     private User user;
@@ -51,10 +56,10 @@ public class UserRole {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public Long getRoleId() {
-		return roleId;
+	public Role getRole() {
+		return role;
 	}
-	public void setRoleId(Long roleId) {
-		this.roleId = roleId;
+	public void setRole(Role role) {
+		this.role = role;
 	}
 }

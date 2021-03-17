@@ -14,16 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import in.sevasuyog.util.CommonUtil;
-
 @Service
 public class CommonDB {
 
 	@Autowired
 	private SessionFactory sessionFactory;
-	
-	@Autowired
-	private CommonUtil commonUtil;
 
 	@Transactional(readOnly = false)
 	public void saveOrUpdate(Object object) {
@@ -48,8 +43,8 @@ public class CommonDB {
 	}
 
 	@Transactional(readOnly = true)
-	public <T> Object get(Serializable id, Class<T> type) {
-		Object obj = sessionFactory.getCurrentSession().get(type, id);
+	public <T> T get(Serializable id, Class<T> type) {
+		T obj = sessionFactory.getCurrentSession().get(type, id);
 		return obj;
 	}
 	
@@ -85,10 +80,6 @@ public class CommonDB {
 				+ "where o.guid = :guid", type);
 		q.setParameter("guid", guid, StringType.INSTANCE);
 		return q.uniqueResult();
-	}
-
-	public <T> T getSingleElement(Query<T> q) {
-		return commonUtil.getSingleElement(q.list());
 	}
 
 	public <T> T getSingleResult(Query<T> q) {

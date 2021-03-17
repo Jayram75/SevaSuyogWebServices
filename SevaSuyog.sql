@@ -463,32 +463,6 @@ LOCK TABLES `qualification` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `sevarole`
---
-
-DROP TABLE IF EXISTS `sevarole`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `sevarole` (
-  `ID` tinyint(4) NOT NULL AUTO_INCREMENT,
-  `GUID` varchar(3) NOT NULL,
-  `SevaRole` varchar(50) NOT NULL,
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `u_role` (`GUID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `sevarole`
---
-
-LOCK TABLES `sevarole` WRITE;
-/*!40000 ALTER TABLE `sevarole` DISABLE KEYS */;
-INSERT INTO `sevarole` VALUES (1,'EE','Employee'),(2,'ER','Employer'),(3,'AD','Admin'),(4,'AV','Advertiser');
-/*!40000 ALTER TABLE `sevarole` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `skill`
 --
 
@@ -511,6 +485,64 @@ CREATE TABLE `skill` (
 LOCK TABLES `skill` WRITE;
 /*!40000 ALTER TABLE `skill` DISABLE KEYS */;
 /*!40000 ALTER TABLE `skill` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `spring_session`
+--
+
+DROP TABLE IF EXISTS `spring_session`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `spring_session` (
+  `PRIMARY_ID` char(36) NOT NULL,
+  `SESSION_ID` char(36) NOT NULL,
+  `CREATION_TIME` bigint(20) NOT NULL,
+  `LAST_ACCESS_TIME` bigint(20) NOT NULL,
+  `MAX_INACTIVE_INTERVAL` int(11) NOT NULL,
+  `EXPIRY_TIME` bigint(20) NOT NULL,
+  `PRINCIPAL_NAME` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`PRIMARY_ID`),
+  UNIQUE KEY `SPRING_SESSION_IX1` (`SESSION_ID`),
+  KEY `SPRING_SESSION_IX2` (`EXPIRY_TIME`),
+  KEY `SPRING_SESSION_IX3` (`PRINCIPAL_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `spring_session`
+--
+
+LOCK TABLES `spring_session` WRITE;
+/*!40000 ALTER TABLE `spring_session` DISABLE KEYS */;
+INSERT INTO `spring_session` VALUES ('3480055c-f4ed-4d42-b4ee-d15d8b8275c2','b1f503bd-805c-46fd-b608-3dcb177d1f68',1615997925555,1615997925555,2592000,1618589925555,NULL),('b5f812bf-a980-4885-a407-f7d0738fa690','5660d904-9ad3-4c73-8d38-83c8c154d712',1615977126136,1615977126136,2592000,1618569126136,NULL);
+/*!40000 ALTER TABLE `spring_session` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `spring_session_attributes`
+--
+
+DROP TABLE IF EXISTS `spring_session_attributes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `spring_session_attributes` (
+  `SESSION_PRIMARY_ID` char(36) NOT NULL,
+  `ATTRIBUTE_NAME` varchar(200) NOT NULL,
+  `ATTRIBUTE_BYTES` blob NOT NULL,
+  PRIMARY KEY (`SESSION_PRIMARY_ID`,`ATTRIBUTE_NAME`),
+  CONSTRAINT `SPRING_SESSION_ATTRIBUTES_FK` FOREIGN KEY (`SESSION_PRIMARY_ID`) REFERENCES `spring_session` (`PRIMARY_ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `spring_session_attributes`
+--
+
+LOCK TABLES `spring_session_attributes` WRITE;
+/*!40000 ALTER TABLE `spring_session_attributes` DISABLE KEYS */;
+INSERT INTO `spring_session_attributes` VALUES ('b5f812bf-a980-4885-a407-f7d0738fa690','UserRole','¨Ì\0sr\0java.lang.Long;ã‰êÃè#ﬂ\0J\0valuexr\0java.lang.NumberÜ¨ïî‡ã\0\0xp\0\0\0\0\0\0\0');
+/*!40000 ALTER TABLE `spring_session_attributes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -732,15 +764,14 @@ DROP TABLE IF EXISTS `userrole`;
 CREATE TABLE `userrole` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `UserID` bigint(20) NOT NULL,
-  `RoleID` tinyint(4) NOT NULL,
+  `Role` enum('EMPLOYER','EMPLOYEE','ADMIN','ADVERTISER') NOT NULL DEFAULT 'EMPLOYEE',
   `GUID` varchar(8) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `u_userrole` (`GUID`),
   KEY `fk_userrole_user` (`UserID`),
-  KEY `fk_userrole_sevarole` (`RoleID`),
-  CONSTRAINT `fk_userrole_sevarole` FOREIGN KEY (`RoleID`) REFERENCES `sevarole` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  KEY `fk_userrole_sevarole` (`Role`),
   CONSTRAINT `fk_userrole_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -749,37 +780,8 @@ CREATE TABLE `userrole` (
 
 LOCK TABLES `userrole` WRITE;
 /*!40000 ALTER TABLE `userrole` DISABLE KEYS */;
+INSERT INTO `userrole` VALUES (2,1,'ADMIN','abc');
 /*!40000 ALTER TABLE `userrole` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `usersession`
---
-
-DROP TABLE IF EXISTS `usersession`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `usersession` (
-  `SessionID` varchar(50) NOT NULL,
-  `DeviceInfo` varchar(150) NOT NULL,
-  `IsExpired` tinyint(1) NOT NULL DEFAULT 0,
-  `InsertTS` timestamp NOT NULL DEFAULT current_timestamp(),
-  `UpdateTS` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `UserRoleID` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`SessionID`),
-  UNIQUE KEY `u_usersession` (`SessionID`),
-  KEY `fk_usersession_userrole` (`UserRoleID`),
-  CONSTRAINT `fk_usersession_userrole` FOREIGN KEY (`UserRoleID`) REFERENCES `userrole` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `usersession`
---
-
-LOCK TABLES `usersession` WRITE;
-/*!40000 ALTER TABLE `usersession` DISABLE KEYS */;
-/*!40000 ALTER TABLE `usersession` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -850,4 +852,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-13 21:57:23
+-- Dump completed on 2021-03-17 21:52:00
