@@ -23,11 +23,10 @@ import in.sevasuyog.model.Greeting;
 import in.sevasuyog.model.User;
 import in.sevasuyog.model.enums.AttributeName;
 import in.sevasuyog.model.enums.ResponseMessage;
-import in.sevasuyog.model.enums.Role;
 import in.sevasuyog.model.request.LoginRequest;
 import in.sevasuyog.model.response.LoginResponse;
+import in.sevasuyog.service.AttributeService;
 import in.sevasuyog.service.UserService;
-import in.sevasuyog.util.AttributeUtil;
 import in.sevasuyog.util.CommonUtil;
 import in.sevasuyog.util.MyPasswordEncoder;
 import in.sevasuyog.util.Strings;
@@ -51,7 +50,7 @@ public class MyController {
 	private MyPasswordEncoder encoder;
 	
 	@Autowired
-	private AttributeUtil attributeUtil;
+	private AttributeService attributeService;
 	
 	@Autowired
 	private CommonUtil commonUtil;
@@ -75,20 +74,6 @@ public class MyController {
 		response.getHeaderNames().forEach(t -> System.out.println(t + " --> " + response.getHeaders(t)));
 		LOGGER.info(commonUtil.toJSON(response.getHeaders("Set-Cookie")));
 		return greetings; 
-	}
-	
-	@PostMapping("/refreshApp") 
-	public String refreshApp() {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
-			}
-			attributeUtil.refresh();
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
 	}
 	
 	@GetMapping("/logoutMe")
@@ -117,12 +102,12 @@ public class MyController {
 				return loginResponse;
 			}
 			
-			if(!attributeUtil.isTrue(user.getUserAttributes(), AttributeName.VERIFIED)) {
+			if(!attributeService.isTrue(user.getUserAttributes(), AttributeName.VERIFIED)) {
 				loginResponse.setMessage(ResponseMessage.NOT_VERIFIED);
 				return loginResponse;
 			}
 			
-			if(!attributeUtil.isTrue(user.getUserAttributes(), AttributeName.ACTIVE)) {
+			if(!attributeService.isTrue(user.getUserAttributes(), AttributeName.ACTIVE)) {
 				loginResponse.setMessage(ResponseMessage.NOT_ACTIVE);
 				return loginResponse;
 			}

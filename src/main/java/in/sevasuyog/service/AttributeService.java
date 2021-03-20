@@ -1,4 +1,4 @@
-package in.sevasuyog.util;
+package in.sevasuyog.service;
 
 import java.util.List;
 import java.util.Set;
@@ -12,8 +12,8 @@ import in.sevasuyog.model.UserAttribute;
 import in.sevasuyog.model.enums.AttributeName;
 
 @Service
-public class AttributeUtil {
-	private static List<Attribute> attributes;
+public class AttributeService {
+	public static List<Attribute> attributes;
 	
 	@Autowired
 	private CommonDB commonDB;
@@ -67,5 +67,19 @@ public class AttributeUtil {
 		if(string.trim().equalsIgnoreCase("true")) return true;
 		if(string.trim().equalsIgnoreCase("false")) return false;
 		return null;
+	}
+
+	public void addOrUpdate(Attribute attribute) {
+		String guid = attribute.getGuid();
+		for(Attribute attr: attributes) {
+			if(attr.getGuid().equalsIgnoreCase(guid)) {
+				attribute.setId(attr.getId());
+				attributes.remove(attr);
+				break;
+			}
+		}
+		
+		commonDB.saveOrUpdate(attribute);
+		attributes.add(attribute);
 	}
 }

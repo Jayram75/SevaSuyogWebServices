@@ -8,13 +8,13 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 
-import in.sevasuyog.util.AttributeUtil;
+import in.sevasuyog.service.AttributeService;
 
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = { HibernateJpaAutoConfiguration.class }) 
 public class Application {
 	@Autowired
-	private AttributeUtil attributeUtil;
+	private AttributeService attributeService;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
@@ -22,6 +22,6 @@ public class Application {
 	
 	@PostConstruct
 	public void init() {
-		attributeUtil.init();
+		attributeService.init();
 	}
 }
