@@ -21,9 +21,7 @@ import in.sevasuyog.model.Bhasha;
 import in.sevasuyog.model.Company;
 import in.sevasuyog.model.enums.ResponseMessage;
 import in.sevasuyog.model.enums.Role;
-import in.sevasuyog.model.response.AttributesResponse;
-import in.sevasuyog.model.response.BhashaResponse;
-import in.sevasuyog.model.response.CompanyResponse;
+import in.sevasuyog.model.response.EntitiesResponse;
 import in.sevasuyog.service.AttributeService;
 import in.sevasuyog.service.CommonService;
 import in.sevasuyog.util.CommonUtil;
@@ -50,157 +48,51 @@ public class AdminController {
 	
 	@DeleteMapping("/company") 
 	public String deleteCompany(@RequestParam String guid) {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
-			}
-			commonService.delete(guid, Company.class);
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch(ConstraintViolationException e) {
-			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			return violation.getPropertyPath() + " " + violation.getMessage();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
+		return delete(guid, Company.class);	
 	}
 	
-	@PostMapping("/company") 
-	public String addOrUpdateCompany(@RequestBody Company companyRequest) {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
-			}
-			commonService.addOrUpdate(companyRequest);
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch(ConstraintViolationException e) {
-			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			return violation.getPropertyPath() + " " + violation.getMessage();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
-	}
-	
-	@GetMapping("/company") 
-	public CompanyResponse getCompanies() {
-		CompanyResponse companyResponse = new CompanyResponse();
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				companyResponse.setMessage(ResponseMessage.OPERATION_NOT_ALLOWED);
-				return companyResponse;
-			}
-			companyResponse.setMessage(ResponseMessage.SUCCESSFUL);
-			companyResponse.setCompanies(commonService.getObjectList(Company.class));
-		} catch (Exception e) {
-			LOGGER.error(e);
-			companyResponse.setMessage(ResponseMessage.SOMETHING_WENT_WRONG);
-		}
-		return companyResponse;
-	}
-	
-	//Bhasha
 	@DeleteMapping("/bhasha") 
 	public String deleteBhasha(@RequestParam String guid) {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
-			}
-			commonService.delete(guid, Bhasha.class);
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch(ConstraintViolationException e) {
-			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			return violation.getPropertyPath() + " " + violation.getMessage();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
+		return delete(guid, Bhasha.class);	
+	}
+	
+	@DeleteMapping("/attribute") 
+	public String deleteAttribute(@RequestParam String guid) {
+		String response = delete(guid, Attribute.class);
+		attributeService.refresh();
+		return response;
+	}
+
+	@PostMapping("/company") 
+	public String addOrUpdateCompany(@RequestBody Company companyRequest) {
+		return addOrUpdate(companyRequest);
 	}
 	
 	@PostMapping("/bhasha") 
 	public String addOrUpdateBhasha(@RequestBody Bhasha bhashaRequest) {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
-			}
-			commonService.addOrUpdate(bhashaRequest);
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch(ConstraintViolationException e) {
-			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			return violation.getPropertyPath() + " " + violation.getMessage();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
-	}
-	
-	@GetMapping("/bhasha") 
-	public BhashaResponse getBhashayen() {
-		BhashaResponse bhashaResponse = new BhashaResponse();
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				bhashaResponse.setMessage(ResponseMessage.OPERATION_NOT_ALLOWED);
-				return bhashaResponse;
-			}
-			bhashaResponse.setMessage(ResponseMessage.SUCCESSFUL);
-			bhashaResponse.setBhashayen(commonService.getObjectList(Bhasha.class));
-		} catch (Exception e) {
-			LOGGER.error(e);
-			bhashaResponse.setMessage(ResponseMessage.SOMETHING_WENT_WRONG);
-		}
-		return bhashaResponse;
-	}
-	
-	//Attributes
-	@DeleteMapping("/attribute") 
-	public String deleteAttribute(@RequestParam String guid) {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
-			}
-			attributeService.delete(guid);
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch(ConstraintViolationException e) {
-			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			return violation.getPropertyPath() + " " + violation.getMessage();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
+		return addOrUpdate(bhashaRequest);
 	}
 	
 	@PostMapping("/attribute") 
 	public String addOrUpdateAttribute(@RequestBody Attribute attributeRequest) {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
-			}
-			attributeService.addOrUpdate(attributeRequest);
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch(ConstraintViolationException e) {
-			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			return violation.getPropertyPath() + " " + violation.getMessage();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
+		String response = addOrUpdate(attributeRequest);
+		attributeService.refresh();
+		return response;
+	}
+	
+	@GetMapping("/company") 
+	public EntitiesResponse<Company> getCompanies() {
+		return getEntities(Company.class);
+	}
+	
+	@GetMapping("/bhasha") 
+	public EntitiesResponse<Bhasha> getBhashayen() {
+		return getEntities(Bhasha.class);
 	}
 	
 	@GetMapping("/attribute") 
-	public AttributesResponse getAttributes() {
-		AttributesResponse attributesResponse = new AttributesResponse();
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				attributesResponse.setMessage(ResponseMessage.OPERATION_NOT_ALLOWED);
-				return attributesResponse;
-			}
-			attributesResponse.setMessage(ResponseMessage.SUCCESSFUL);
-			attributesResponse.setAttributes(AttributeService.attributes);
-		} catch (Exception e) {
-			LOGGER.error(e);
-			attributesResponse.setMessage(ResponseMessage.SOMETHING_WENT_WRONG);
-		}
-		return attributesResponse;
+	public EntitiesResponse<Attribute> getAttributes() {
+		return getEntities(Attribute.class);
 	}
 	
 	@PostMapping("/refreshApp") 
@@ -215,5 +107,55 @@ public class AdminController {
 			LOGGER.error(e);
 			return ResponseMessage.SOMETHING_WENT_WRONG.name();
 		}
+	}
+	
+
+	
+	private String delete(String guid, Class<?> class1) {
+		try {
+			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
+				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
+			}
+			commonService.delete(guid, class1);
+			return ResponseMessage.SUCCESSFUL.name();
+		} catch(ConstraintViolationException e) {
+			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
+			return violation.getPropertyPath() + " " + violation.getMessage();
+		} catch (Exception e) {
+			LOGGER.error(e);
+			return ResponseMessage.SOMETHING_WENT_WRONG.name();
+		}
+	}
+	
+	private <T> String addOrUpdate(@RequestBody T request) {
+		try {
+			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
+				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
+			}
+			commonService.addOrUpdate(request);
+			return ResponseMessage.SUCCESSFUL.name();
+		} catch(ConstraintViolationException e) {
+			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
+			return violation.getPropertyPath() + " " + violation.getMessage();
+		} catch (Exception e) {
+			LOGGER.error(e);
+			return ResponseMessage.SOMETHING_WENT_WRONG.name();
+		}
+	}
+	
+	public <T> EntitiesResponse<T> getEntities(Class<T> clazz) {
+		EntitiesResponse<T> entitiesResponse = new EntitiesResponse<T>();
+		try {
+			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
+				entitiesResponse.setMessage(ResponseMessage.OPERATION_NOT_ALLOWED);
+				return entitiesResponse;
+			}
+			entitiesResponse.setMessage(ResponseMessage.SUCCESSFUL);
+			entitiesResponse.setEntities(commonService.getObjectList(clazz));
+		} catch (Exception e) {
+			LOGGER.error(e);
+			entitiesResponse.setMessage(ResponseMessage.SOMETHING_WENT_WRONG);
+		}
+		return entitiesResponse;
 	}
 }

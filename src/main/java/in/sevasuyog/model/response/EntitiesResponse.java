@@ -2,12 +2,11 @@ package in.sevasuyog.model.response;
 
 import java.util.List;
 
-import in.sevasuyog.model.Attribute;
 import in.sevasuyog.model.enums.ResponseMessage;
 
-public class AttributesResponse {
+public class EntitiesResponse<T> {
 	private ResponseMessage message;
-	private List<Attribute> attributes;
+	private List<T> entities;
 	
 	public ResponseMessage getMessage() {
 		return message;
@@ -15,10 +14,10 @@ public class AttributesResponse {
 	public void setMessage(ResponseMessage message) {
 		this.message = message;
 	}
-	public List<Attribute> getAttributes() {
-		return attributes;
+	public List<T> getEntities() {
+		return entities;
 	}
-	public void setAttributes(List<Attribute> attributes) {
-		this.attributes = attributes;
+	public void setEntities(List<T> entities) {
+		this.entities = entities;
 	}
 }

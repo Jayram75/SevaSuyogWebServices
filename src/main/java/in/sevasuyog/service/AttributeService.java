@@ -68,28 +68,4 @@ public class AttributeService {
 		if(string.trim().equalsIgnoreCase("false")) return false;
 		return null;
 	}
-
-	public void addOrUpdate(Attribute attribute) {
-		String guid = attribute.getGuid();
-		for(Attribute attr: attributes) {
-			if(attr.getGuid().equalsIgnoreCase(guid)) {
-				attribute.setId(attr.getId());
-				attributes.remove(attr);
-				break;
-			}
-		}
-		
-		commonDB.saveOrUpdate(attribute);
-		attributes.add(attribute);
-	}
-
-	public void delete(String guid) {
-		for(Attribute attr: attributes) {
-			if(attr.getGuid().equalsIgnoreCase(guid)) {
-				commonDB.delete(attr);
-				attributes.remove(attr);
-				return;
-			}
-		}
-	}
 }
