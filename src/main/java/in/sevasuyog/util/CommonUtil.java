@@ -1,10 +1,13 @@
 package in.sevasuyog.util;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,8 @@ import in.sevasuyog.service.UserService;
 
 @Service
 public class CommonUtil {
+	private static final Logger LOGGER = LogManager.getLogger(CommonUtil.class);
+	
 	@Autowired
 	private ObjectMapper objectMapper;
 	
@@ -71,5 +76,30 @@ public class CommonUtil {
 	public boolean isOperationAllowed(HttpSession session, Role role) {
 		Long userId = (Long) session.getAttribute(Strings.USER_ID);
 		return isOperationAllowed(userId, role);
+	}
+	
+	public String getGuid(Object object) {
+		return (String) getFieldValue(object, "guid");
+	}
+	
+	public Object getFieldValue(Object object, String fieldName) {
+		try {
+			Field field = object.getClass().getDeclaredField(fieldName);    
+			field.setAccessible(true);
+			return field.get(object);
+		} catch (Exception e) {
+			LOGGER.error(e);
+			return null;
+		}
+	}
+
+	public void setId(Object obj, Long id) {
+        try {
+        	Field field = obj.getClass().getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(obj, id);
+        } catch (Exception e) {
+        	LOGGER.error(e);
+        }
 	}
 }

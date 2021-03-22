@@ -14,11 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import in.sevasuyog.util.CommonUtil;
+
 @Service
 public class CommonDB {
 
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	@Autowired
+	private CommonUtil commonUtil;
 
 	@Transactional(readOnly = false)
 	public void saveOrUpdate(Object object) {
@@ -50,8 +55,8 @@ public class CommonDB {
 	
 	@Transactional(readOnly = true)
 	public <T> Long getIdFromGuid(String guid, Class<T> type) {
-		Query<T> q = sessionFactory.getCurrentSession().createQuery("select o.id from " + type.getSimpleName() + " o "
-				+ "where o.guid = :guid", type);
+		Query<Long> q = sessionFactory.getCurrentSession().createQuery("select o.id from " 
+			+ type.getSimpleName() + " o " + "where o.guid = :guid", Long.class);
 		q.setParameter("guid", guid, StringType.INSTANCE);
 		return (Long)q.uniqueResult();
 	}
@@ -75,7 +80,7 @@ public class CommonDB {
 	}
 
 	@Transactional(readOnly = true)
-	public <T> Object getFromGUID(String guid, Class<T> type) {
+	public <T> T getFromGUID(String guid, Class<T> type) {
 		Query<T> q = sessionFactory.getCurrentSession().createQuery("select o from " + type.getSimpleName() + " o "
 				+ "where o.guid = :guid", type);
 		q.setParameter("guid", guid, StringType.INSTANCE);
@@ -88,6 +93,19 @@ public class CommonDB {
 		} catch (NoResultException e) {
 			return null;
 		}
+	}
+
+	@Transactional(readOnly = false)
+	public <T> void deleteUsingGUID(String guid, Class<T> class1) {
+		T obj = getFromGUID(guid, class1);
+		if(obj == null) return;
+		sessionFactory.getCurrentSession().delete(obj);
+	}
+
+	public void addOrUpdate(Object obj) {
+		Long id = getIdFromGuid(commonUtil.getGuid(obj), obj.getClass());
+		commonUtil.setId(obj, id);
+		saveOrUpdate(obj);
 	}
 }
 

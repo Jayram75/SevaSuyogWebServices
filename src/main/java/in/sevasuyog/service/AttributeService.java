@@ -82,4 +82,14 @@ public class AttributeService {
 		commonDB.saveOrUpdate(attribute);
 		attributes.add(attribute);
 	}
+
+	public void delete(String guid) {
+		for(Attribute attr: attributes) {
+			if(attr.getGuid().equalsIgnoreCase(guid)) {
+				commonDB.delete(attr);
+				attributes.remove(attr);
+				return;
+			}
+		}
+	}
 }
