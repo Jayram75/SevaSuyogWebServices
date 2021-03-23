@@ -1,12 +1,18 @@
 package in.sevasuyog.controller;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.Validator;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,22 +24,25 @@ import org.springframework.web.bind.annotation.RestController;
 import in.sevasuyog.annotation.Logging;
 import in.sevasuyog.model.Attribute;
 import in.sevasuyog.model.Bhasha;
+import in.sevasuyog.model.City;
 import in.sevasuyog.model.Company;
-import in.sevasuyog.model.enums.ResponseMessage;
-import in.sevasuyog.model.enums.Role;
+import in.sevasuyog.model.IndianState;
+import in.sevasuyog.model.request.CityRequest;
 import in.sevasuyog.model.response.EntitiesResponse;
+import in.sevasuyog.service.AdminService;
 import in.sevasuyog.service.AttributeService;
 import in.sevasuyog.service.CommonService;
 import in.sevasuyog.util.CommonUtil;
+import in.sevasuyog.util.GetOperation;
+import in.sevasuyog.util.Operation;
 import io.swagger.annotations.Api;
 
+@Validated
 @Logging
 @RestController
 @RequestMapping(value = "/admin")
 @Api
 public class AdminController {
-	private static final Logger LOGGER = LogManager.getLogger(AdminController.class);
-	
 	@Autowired
 	private CommonUtil commonUtil;
 	
@@ -45,6 +54,26 @@ public class AdminController {
 	
 	@Autowired
 	private CommonService commonService;
+	
+	@Autowired
+	private AdminService adminService;
+	
+	@Autowired
+    private Validator validator;
+	
+	/* ---- DELETE ---- */
+	
+	@DeleteMapping("/city") 
+	public String deleteCity(
+			@Valid @RequestParam @NotBlank @Size(max = 4, min = 1) 
+			String guid) {
+		return delete(guid, City.class);	
+	}
+	
+	@DeleteMapping("/state") 
+	public String deleteState(@RequestParam String guid) {
+		return delete(guid, IndianState.class);	
+	}
 	
 	@DeleteMapping("/company") 
 	public String deleteCompany(@RequestParam String guid) {
@@ -62,7 +91,27 @@ public class AdminController {
 		attributeService.refresh();
 		return response;
 	}
+	
+	/* ---- POST ---- */
 
+	@PostMapping("/city") 
+	public String addOrUpdateCity(@RequestBody CityRequest cityRequest) {
+		return new Operation() {
+			@Override protected void operate() {
+				Set<ConstraintViolation<CityRequest>> a = validator.validate(cityRequest);
+				if(!a.isEmpty()) {
+					throw new ConstraintViolationException(a);
+				}
+				adminService.addOrUpdateCity(cityRequest);
+			}
+		}.execute(commonUtil, session);
+	}
+	
+	@PostMapping("/state") 
+	public String addOrUpdateState(@RequestBody IndianState state) {
+		return addOrUpdate(state);
+	}
+	
 	@PostMapping("/company") 
 	public String addOrUpdateCompany(@RequestBody Company companyRequest) {
 		return addOrUpdate(companyRequest);
@@ -80,6 +129,22 @@ public class AdminController {
 		return response;
 	}
 	
+	/* ---- GET ---- */
+	
+	@GetMapping("/city") 
+	public EntitiesResponse<City> getCities(@RequestParam String stateGuid) {
+		return new GetOperation<City>(commonUtil, session) {
+			@Override protected List<City> fetch() {
+				return adminService.getCities(stateGuid);
+			}
+		}.getEntities();
+	}
+	
+	@GetMapping("/state") 
+	public EntitiesResponse<IndianState> getStates() {
+		return getEntities(IndianState.class);
+	}
+	
 	@GetMapping("/company") 
 	public EntitiesResponse<Company> getCompanies() {
 		return getEntities(Company.class);
@@ -92,70 +157,43 @@ public class AdminController {
 	
 	@GetMapping("/attribute") 
 	public EntitiesResponse<Attribute> getAttributes() {
-		return getEntities(Attribute.class);
+		return new GetOperation<Attribute>(commonUtil, session) {
+			@Override protected List<Attribute> fetch() {
+				return attributeService.getAttributes();
+			}
+		}.getEntities();
 	}
-	
+
 	@PostMapping("/refreshApp") 
 	public String refreshApp() {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
+		return new Operation() {
+			@Override protected void operate() {
+				attributeService.refresh();
 			}
-			attributeService.refresh();
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
+		}.execute(commonUtil, session);
 	}
 	
-
-	
 	private String delete(String guid, Class<?> class1) {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
+		return new Operation() {
+			@Override protected void operate() {
+				commonService.delete(guid, class1);
 			}
-			commonService.delete(guid, class1);
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch(ConstraintViolationException e) {
-			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			return violation.getPropertyPath() + " " + violation.getMessage();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
+		}.execute(commonUtil, session);
 	}
 	
 	private <T> String addOrUpdate(@RequestBody T request) {
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				return ResponseMessage.OPERATION_NOT_ALLOWED.name();
+		return new Operation() {
+			@Override protected void operate() {
+				commonService.addOrUpdate(request);
 			}
-			commonService.addOrUpdate(request);
-			return ResponseMessage.SUCCESSFUL.name();
-		} catch(ConstraintViolationException e) {
-			ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
-			return violation.getPropertyPath() + " " + violation.getMessage();
-		} catch (Exception e) {
-			LOGGER.error(e);
-			return ResponseMessage.SOMETHING_WENT_WRONG.name();
-		}
+		}.execute(commonUtil, session);
 	}
 	
-	public <T> EntitiesResponse<T> getEntities(Class<T> clazz) {
-		EntitiesResponse<T> entitiesResponse = new EntitiesResponse<T>();
-		try {
-			if(!commonUtil.isOperationAllowed(session, Role.ADMIN)) {
-				entitiesResponse.setMessage(ResponseMessage.OPERATION_NOT_ALLOWED);
-				return entitiesResponse;
+	private <T> EntitiesResponse<T> getEntities(Class<T> clazz) {
+		return new GetOperation<T>(commonUtil, session) {
+			@Override protected List<T> fetch() {
+				return commonService.getObjectList(clazz);
 			}
-			entitiesResponse.setMessage(ResponseMessage.SUCCESSFUL);
-			entitiesResponse.setEntities(commonService.getObjectList(clazz));
-		} catch (Exception e) {
-			LOGGER.error(e);
-			entitiesResponse.setMessage(ResponseMessage.SOMETHING_WENT_WRONG);
-		}
-		return entitiesResponse;
+		}.getEntities();
 	}
 }

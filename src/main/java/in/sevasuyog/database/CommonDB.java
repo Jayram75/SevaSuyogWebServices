@@ -3,7 +3,6 @@ package in.sevasuyog.database;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
@@ -87,14 +86,6 @@ public class CommonDB {
 		return q.uniqueResult();
 	}
 
-	public <T> T getSingleResult(Query<T> q) {
-		try {
-			return q.getSingleResult();
-		} catch (NoResultException e) {
-			return null;
-		}
-	}
-
 	@Transactional(readOnly = false)
 	public <T> void deleteUsingGUID(String guid, Class<T> class1) {
 		T obj = getFromGUID(guid, class1);
@@ -102,10 +93,19 @@ public class CommonDB {
 		sessionFactory.getCurrentSession().delete(obj);
 	}
 
+	@Transactional(readOnly = false)
 	public void addOrUpdate(Object obj) {
 		Long id = getIdFromGuid(commonUtil.getGuid(obj), obj.getClass());
 		commonUtil.setId(obj, id);
 		saveOrUpdate(obj);
+	}
+
+	@Transactional(readOnly = true)
+	public <T> List<T> fetchAll(Class<T> type, String parameterName, Object value) {
+		Query<T> q = sessionFactory.getCurrentSession().createQuery("select o from " + type.getSimpleName() + " o "
+				+ "where o." + parameterName + " = :parameter", type);
+		q.setParameter("parameter", value);
+		return q.getResultList();
 	}
 }
 

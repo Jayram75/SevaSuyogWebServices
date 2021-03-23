@@ -13,7 +13,7 @@ import in.sevasuyog.model.enums.AttributeName;
 
 @Service
 public class AttributeService {
-	public static List<Attribute> attributes;
+	private static List<Attribute> attributes;
 	
 	@Autowired
 	private CommonDB commonDB;
@@ -24,6 +24,10 @@ public class AttributeService {
 
 	public void refresh() {
 		attributes = commonDB.fetchAll(Attribute.class);
+	}
+	
+	public List<Attribute> getAttributes() {
+		return attributes;
 	}
 
 	public boolean isTrue(Set<UserAttribute> userAttributes, AttributeName attributeName) {
