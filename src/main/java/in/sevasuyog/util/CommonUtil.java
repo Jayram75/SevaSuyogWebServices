@@ -1,10 +1,14 @@
 package in.sevasuyog.util;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import in.sevasuyog.model.User;
 import in.sevasuyog.model.UserRole;
+import in.sevasuyog.model.enums.ResponseMessage;
 import in.sevasuyog.model.enums.Role;
 import in.sevasuyog.service.UserService;
 
@@ -28,6 +33,9 @@ public class CommonUtil {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private Validator validator;
 
 	public <T> T fromJSON(String jsonPacket) {
 		try {
@@ -65,18 +73,6 @@ public class CommonUtil {
 		
 		return false;
 	}
-
-	public boolean isOperationAllowed(Long userId, Role role) {
-		if(userId == null) return false;
-
-		User user = userService.loadUserById(userId);
-		return isOperationAllowed(user, role);
-	}
-
-	public boolean isOperationAllowed(HttpSession session, Role role) {
-		Long userId = (Long) session.getAttribute(Strings.USER_ID);
-		return isOperationAllowed(userId, role);
-	}
 	
 	public String getGuid(Object object) {
 		return (String) getFieldValue(object, "guid");
@@ -101,5 +97,42 @@ public class CommonUtil {
         } catch (Exception e) {
         	LOGGER.error(e);
         }
+	}
+
+	public boolean isOperationAllowed(Long userId, Role role) {
+		if(userId == null) return false;
+
+		User user = userService.loadUserById(userId);
+		return isOperationAllowed(user, role);
+	}
+
+	public void isOperationAllowed(HttpSession session, List<Role> roles) {
+		boolean isOperationAllowed = false;
+		Long userId = (Long) session.getAttribute(Strings.USER_ID);
+		for(Role role: roles) {
+			if(isOperationAllowed(userId, role)) {
+				isOperationAllowed = true;
+			}
+		}
+		if(!isOperationAllowed) {
+			throw new UnsupportedOperationException(ResponseMessage.OPERATION_NOT_ALLOWED.name());
+		}
+	}
+
+	private void isOperationAllowed(HttpSession session, Role role) {
+		isOperationAllowed(session, Collections.singletonList(role));
+	}
+
+	public void isOperationAllowed(HttpSession session) {
+		isOperationAllowed(session, Role.ADMIN);
+	}
+	
+	public <T> void validate(T obj) {
+		if(obj != null) {
+			Set<ConstraintViolation<T>> a = validator.validate(obj);
+			if(!a.isEmpty()) {
+				throw new ConstraintViolationException(a);
+			}
+		}
 	}
 }

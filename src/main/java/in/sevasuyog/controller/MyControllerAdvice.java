@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import in.sevasuyog.model.enums.ResponseMessage;
+
 @ControllerAdvice
 public class MyControllerAdvice extends ResponseEntityExceptionHandler {
 	private static final Logger LOGGER = LogManager.getLogger(MyControllerAdvice.class);
@@ -28,11 +30,25 @@ public class MyControllerAdvice extends ResponseEntityExceptionHandler {
         );
     }
     
+    @ExceptionHandler({ IllegalArgumentException.class })
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e, WebRequest request) {
+        return new ResponseEntity<Object>(
+        	e.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST
+        );
+    }
+    
+    @ExceptionHandler({ UnsupportedOperationException.class })
+    public ResponseEntity<Object> handleUnsupportedOperationException(UnsupportedOperationException e, WebRequest request) {
+        return new ResponseEntity<Object>(
+        	ResponseMessage.OPERATION_NOT_ALLOWED.name(), new HttpHeaders(), HttpStatus.BAD_REQUEST
+        );
+    }
+    
     @ExceptionHandler({ Throwable.class })
     public ResponseEntity<Object> handleThrowable(Throwable e, WebRequest request) {
     	LOGGER.error(e);
         return new ResponseEntity<Object>(
-        	e.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST
+        	ResponseMessage.SOMETHING_WENT_WRONG.name(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
     

@@ -1,18 +1,13 @@
 package in.sevasuyog.controller;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import javax.validation.Validator;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +22,7 @@ import in.sevasuyog.model.Bhasha;
 import in.sevasuyog.model.City;
 import in.sevasuyog.model.Company;
 import in.sevasuyog.model.IndianState;
+import in.sevasuyog.model.enums.ResponseMessage;
 import in.sevasuyog.model.request.CityRequest;
 import in.sevasuyog.model.response.EntitiesResponse;
 import in.sevasuyog.service.AdminService;
@@ -34,18 +30,13 @@ import in.sevasuyog.service.AttributeService;
 import in.sevasuyog.service.CommonService;
 import in.sevasuyog.util.CommonUtil;
 import in.sevasuyog.util.GetOperation;
-import in.sevasuyog.util.Operation;
 import io.swagger.annotations.Api;
 
-@Validated
 @Logging
 @RestController
 @RequestMapping(value = "/admin")
 @Api
 public class AdminController {
-	@Autowired
-	private CommonUtil commonUtil;
-	
 	@Autowired
     private HttpSession session;
 	
@@ -57,9 +48,9 @@ public class AdminController {
 	
 	@Autowired
 	private AdminService adminService;
-	
+
 	@Autowired
-    private Validator validator;
+	public CommonUtil commonUtil;
 	
 	/* ---- DELETE ---- */
 	
@@ -71,22 +62,30 @@ public class AdminController {
 	}
 	
 	@DeleteMapping("/state") 
-	public String deleteState(@RequestParam String guid) {
+	public String deleteState(
+			@Valid @RequestParam @NotBlank @Size(max = 3, min = 1) 
+			String guid) {
 		return delete(guid, IndianState.class);	
 	}
 	
 	@DeleteMapping("/company") 
-	public String deleteCompany(@RequestParam String guid) {
+	public String deleteCompany(
+			@Valid @RequestParam @NotBlank @Size(max = 3, min = 1) 
+			String guid) {
 		return delete(guid, Company.class);	
 	}
 	
 	@DeleteMapping("/bhasha") 
-	public String deleteBhasha(@RequestParam String guid) {
+	public String deleteBhasha(
+			@Valid @RequestParam @NotBlank @Size(max = 3, min = 1) 
+			String guid) {
 		return delete(guid, Bhasha.class);	
 	}
 	
 	@DeleteMapping("/attribute") 
-	public String deleteAttribute(@RequestParam String guid) {
+	public String deleteAttribute(
+			@Valid @RequestParam @NotBlank @Size(max = 3, min = 1) 
+			String guid) {
 		String response = delete(guid, Attribute.class);
 		attributeService.refresh();
 		return response;
@@ -96,15 +95,10 @@ public class AdminController {
 
 	@PostMapping("/city") 
 	public String addOrUpdateCity(@RequestBody CityRequest cityRequest) {
-		return new Operation() {
-			@Override protected void operate() {
-				Set<ConstraintViolation<CityRequest>> a = validator.validate(cityRequest);
-				if(!a.isEmpty()) {
-					throw new ConstraintViolationException(a);
-				}
-				adminService.addOrUpdateCity(cityRequest);
-			}
-		}.execute(commonUtil, session);
+		commonUtil.isOperationAllowed(session);
+		commonUtil.validate(cityRequest);
+		adminService.addOrUpdateCity(cityRequest);
+		return ResponseMessage.SUCCESSFUL.name();
 	}
 	
 	@PostMapping("/state") 
@@ -133,11 +127,11 @@ public class AdminController {
 	
 	@GetMapping("/city") 
 	public EntitiesResponse<City> getCities(@RequestParam String stateGuid) {
-		return new GetOperation<City>(commonUtil, session) {
-			@Override protected List<City> fetch() {
+		return new MyGetOperation<City>() {
+			@Override protected List<City> fetch(Class<City> clazz) {
 				return adminService.getCities(stateGuid);
 			}
-		}.getEntities();
+		}.getEntities(City.class);
 	}
 	
 	@GetMapping("/state") 
@@ -157,43 +151,45 @@ public class AdminController {
 	
 	@GetMapping("/attribute") 
 	public EntitiesResponse<Attribute> getAttributes() {
-		return new GetOperation<Attribute>(commonUtil, session) {
-			@Override protected List<Attribute> fetch() {
+		return new MyGetOperation<Attribute>() {
+			@Override protected List<Attribute> fetch(Class<Attribute> clazz) {
 				return attributeService.getAttributes();
 			}
-		}.getEntities();
+		}.getEntities(Attribute.class);
 	}
 
 	@PostMapping("/refreshApp") 
 	public String refreshApp() {
-		return new Operation() {
-			@Override protected void operate() {
-				attributeService.refresh();
-			}
-		}.execute(commonUtil, session);
+		commonUtil.isOperationAllowed(session);
+		attributeService.refresh();
+		return ResponseMessage.SUCCESSFUL.name();
 	}
 	
 	private String delete(String guid, Class<?> class1) {
-		return new Operation() {
-			@Override protected void operate() {
-				commonService.delete(guid, class1);
-			}
-		}.execute(commonUtil, session);
+		commonUtil.isOperationAllowed(session);
+		commonService.delete(guid, class1);
+		return ResponseMessage.SUCCESSFUL.name();
 	}
 	
 	private <T> String addOrUpdate(@RequestBody T request) {
-		return new Operation() {
-			@Override protected void operate() {
-				commonService.addOrUpdate(request);
-			}
-		}.execute(commonUtil, session);
+		commonUtil.isOperationAllowed(session);
+		commonUtil.validate(request);
+		commonService.addOrUpdate(request);
+		return ResponseMessage.SUCCESSFUL.name();
 	}
 	
 	private <T> EntitiesResponse<T> getEntities(Class<T> clazz) {
-		return new GetOperation<T>(commonUtil, session) {
-			@Override protected List<T> fetch() {
-				return commonService.getObjectList(clazz);
-			}
-		}.getEntities();
+		return new MyGetOperation<T>().getEntities(clazz);
+	}
+	
+	class MyGetOperation<T> extends GetOperation<T> {
+		public MyGetOperation() {
+			commonUtil.isOperationAllowed(session);
+		}
+		@Override
+		protected List<T> fetch(Class<T> clazz) {
+			return commonService.getObjectList(clazz);
+		}
 	}
 }
+
