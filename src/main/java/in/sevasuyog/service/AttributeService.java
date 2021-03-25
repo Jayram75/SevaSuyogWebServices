@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import in.sevasuyog.database.CommonDB;
 import in.sevasuyog.model.Attribute;
+import in.sevasuyog.model.User;
 import in.sevasuyog.model.UserAttribute;
 import in.sevasuyog.model.enums.AttributeName;
 
@@ -71,5 +72,29 @@ public class AttributeService {
 		if(string.trim().equalsIgnoreCase("true")) return true;
 		if(string.trim().equalsIgnoreCase("false")) return false;
 		return null;
+	}
+
+	public void setValue(User user, AttributeName attributeName, String value) {
+		Attribute attribute = null;
+		for(Attribute attr: attributes) {
+			if(attr.getGuid().equalsIgnoreCase(attributeName.getGUID())) {
+				attribute = attr;
+				break;
+			}
+		}
+		
+		for(UserAttribute userAttribute: user.getUserAttributes()) {
+			if(userAttribute.getAttributeId().longValue() == attribute.getId().longValue()) {
+				userAttribute.setAttributeValue(value.trim());
+				commonDB.update(userAttribute);
+				return;
+			}
+		}
+		
+		UserAttribute userAttribute = new UserAttribute();
+		userAttribute.setUserId(user.getId());
+		userAttribute.setAttributeId(attribute.getId());
+		userAttribute.setAttributeValue(value.trim());
+		commonDB.save(userAttribute);
 	}
 }

@@ -23,7 +23,7 @@ import in.sevasuyog.model.Greeting;
 import in.sevasuyog.model.User;
 import in.sevasuyog.model.enums.AttributeName;
 import in.sevasuyog.model.enums.ResponseMessage;
-import in.sevasuyog.model.request.LoginRequest;
+import in.sevasuyog.model.request.UserRequest;
 import in.sevasuyog.model.response.LoginResponse;
 import in.sevasuyog.service.AttributeService;
 import in.sevasuyog.service.UserService;
@@ -90,7 +90,7 @@ public class MyController {
 	
 	@Logging(value = false) // For not logging the PASSWORD as it is a sensitive information!
 	@PostMapping("/login")
-	public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+	public LoginResponse login(@RequestBody UserRequest loginRequest) {
 		LoginResponse loginResponse = new LoginResponse();
 		
 		try {

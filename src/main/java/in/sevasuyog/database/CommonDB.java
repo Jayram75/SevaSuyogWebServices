@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import in.sevasuyog.model.enums.ResponseMessage;
 import in.sevasuyog.util.CommonUtil;
 
 @Service
@@ -89,7 +90,7 @@ public class CommonDB {
 	@Transactional(readOnly = false)
 	public <T> void deleteUsingGUID(String guid, Class<T> class1) {
 		T obj = getFromGUID(guid, class1);
-		if(obj == null) return;
+		if(obj == null) throw new UnsupportedOperationException(ResponseMessage.ENTITY_NOT_FOUND.name());
 		sessionFactory.getCurrentSession().delete(obj);
 	}
 
@@ -106,6 +107,14 @@ public class CommonDB {
 				+ "where o." + parameterName + " = :parameter", type);
 		q.setParameter("parameter", value);
 		return q.getResultList();
+	}
+	
+	@Transactional(readOnly = true)
+	public <T> T get(Class<T> type, String parameterName, Object value) {
+		Query<T> q = sessionFactory.getCurrentSession().createQuery("select o from " + type.getSimpleName() + " o "
+				+ "where o." + parameterName + " = :parameter", type);
+		q.setParameter("parameter", value);
+		return q.uniqueResult();
 	}
 }
 

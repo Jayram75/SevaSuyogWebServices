@@ -40,7 +40,7 @@ public class MyControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ UnsupportedOperationException.class })
     public ResponseEntity<Object> handleUnsupportedOperationException(UnsupportedOperationException e, WebRequest request) {
         return new ResponseEntity<Object>(
-        	ResponseMessage.OPERATION_NOT_ALLOWED.name(), new HttpHeaders(), HttpStatus.BAD_REQUEST
+        	e.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST
         );
     }
     

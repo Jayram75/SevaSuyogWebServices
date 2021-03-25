@@ -165,9 +165,9 @@ public class AdminController {
 		return ResponseMessage.SUCCESSFUL.name();
 	}
 	
-	private String delete(String guid, Class<?> class1) {
+	private String delete(String guid, Class<?> clazz) {
 		commonUtil.isOperationAllowed(session);
-		commonService.delete(guid, class1);
+		commonService.delete(guid, clazz);
 		return ResponseMessage.SUCCESSFUL.name();
 	}
 	

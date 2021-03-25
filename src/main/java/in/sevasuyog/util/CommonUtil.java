@@ -60,19 +60,6 @@ public class CommonUtil {
 			return null;
 		}
 	}
-
-	public boolean isOperationAllowed(User user, Role role) {
-		if(user == null) return false;
-		
-		Set<UserRole> userRoles = user.getUserRoles();
-		for(UserRole userRole: userRoles) {
-			if(userRole.getRole() == role) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
 	
 	public String getGuid(Object object) {
 		return (String) getFieldValue(object, "guid");
@@ -99,27 +86,51 @@ public class CommonUtil {
         }
 	}
 
-	public boolean isOperationAllowed(Long userId, Role role) {
-		if(userId == null) return false;
-
-		User user = userService.loadUserById(userId);
-		return isOperationAllowed(user, role);
+	private boolean isOperationAllowedInternal(User user, Role role) {
+		if(user == null) return false;
+		
+		Set<UserRole> userRoles = user.getUserRoles();
+		for(UserRole userRole: userRoles) {
+			if(userRole.getRole() == role) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
-	public void isOperationAllowed(HttpSession session, List<Role> roles) {
+	public void isOperationAllowed(User user, List<Role> roles) {
 		boolean isOperationAllowed = false;
-		Long userId = (Long) session.getAttribute(Strings.USER_ID);
 		for(Role role: roles) {
-			if(isOperationAllowed(userId, role)) {
+			if(isOperationAllowedInternal(user, role)) {
 				isOperationAllowed = true;
+				break;
 			}
 		}
 		if(!isOperationAllowed) {
 			throw new UnsupportedOperationException(ResponseMessage.OPERATION_NOT_ALLOWED.name());
 		}
 	}
+	
+	public void isOperationAllowed(User user, Role role) {
+		isOperationAllowed(user, Collections.singletonList(role));
+	}
 
-	private void isOperationAllowed(HttpSession session, Role role) {
+	public void isOperationAllowed(User user) {
+		isOperationAllowed(user, Role.ADMIN);
+	}
+
+	public void isOperationAllowed(Long userId, List<Role> roles) {
+		User user = userService.loadUserById(userId);
+		isOperationAllowed(user, roles);
+	}
+	
+	public void isOperationAllowed(HttpSession session, List<Role> roles) {
+		Long userId = (Long) session.getAttribute(Strings.USER_ID);
+		isOperationAllowed(userId, roles);
+	}
+
+	public void isOperationAllowed(HttpSession session, Role role) {
 		isOperationAllowed(session, Collections.singletonList(role));
 	}
 
