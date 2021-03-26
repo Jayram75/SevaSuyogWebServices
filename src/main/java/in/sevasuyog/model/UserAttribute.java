@@ -17,14 +17,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @DynamicUpdate(value = true)
 public class UserAttribute {
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonIgnore
     private Long id;
 	private Long userId;
 	private Long attributeId;
 	private String attributeValue;
 	@ManyToOne
-    @JoinColumn(name="UserID")
+    @JoinColumn(name="UserID", insertable = false, updatable = false)
     private User user;
 	
 	public Long getId() {

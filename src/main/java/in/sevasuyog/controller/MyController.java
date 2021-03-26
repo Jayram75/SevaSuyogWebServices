@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,6 +65,9 @@ public class MyController {
 	@Autowired
 	private HttpServletResponse response;
 	
+	@Autowired
+	public SessionRegistry sessionRegistry;
+	
 	@GetMapping("/greetings")
 	public List<Greeting> greetings(@ApiIgnore @CookieValue(value="myCookie",required = false) String myCookie) throws Exception {
 		List<Greeting> greetings = commonDB.fetchAll(Greeting.class);
@@ -88,7 +92,6 @@ public class MyController {
 		return ResponseMessage.SUCCESSFUL.name();
 	}
 	
-	@Logging(value = false) // For not logging the PASSWORD as it is a sensitive information!
 	@PostMapping("/login")
 	public LoginResponse login(@RequestBody UserRequest loginRequest) {
 		LoginResponse loginResponse = new LoginResponse();
@@ -113,6 +116,7 @@ public class MyController {
 			}
 			
 			session.setAttribute(Strings.USER_ID, user.getId());
+			sessionRegistry.registerNewSession(session.getId(), user.getId());
 			
 			loginResponse.setMessage(ResponseMessage.SUCCESSFUL);
 			loginResponse.setUser(user);

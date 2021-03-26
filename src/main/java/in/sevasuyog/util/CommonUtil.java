@@ -119,15 +119,9 @@ public class CommonUtil {
 	public void isOperationAllowed(User user) {
 		isOperationAllowed(user, Role.ADMIN);
 	}
-
-	public void isOperationAllowed(Long userId, List<Role> roles) {
-		User user = userService.loadUserById(userId);
-		isOperationAllowed(user, roles);
-	}
 	
 	public void isOperationAllowed(HttpSession session, List<Role> roles) {
-		Long userId = (Long) session.getAttribute(Strings.USER_ID);
-		isOperationAllowed(userId, roles);
+		isOperationAllowed(userService.getLoggedInUser(session), roles);
 	}
 
 	public void isOperationAllowed(HttpSession session, Role role) {

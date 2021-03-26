@@ -24,7 +24,6 @@ import in.sevasuyog.service.AttributeService;
 import in.sevasuyog.service.UserService;
 import in.sevasuyog.util.CommonUtil;
 import in.sevasuyog.util.MyPasswordEncoder;
-import in.sevasuyog.util.Strings;
 import io.swagger.annotations.Api;
 
 @Logging
@@ -53,7 +52,7 @@ public class UserController {
 	public String disableUser(
 			@Valid @RequestParam @NotBlank @Size(max = 50, min = 1) 
 			String username) {
-		User user = userService.loadUserById((Long) session.getAttribute(Strings.USER_ID));
+		User user = userService.getLoggedInUser(session);
 		commonUtil.isOperationAllowed(user, Arrays.asList(Role.values()));
 		attributeService.setValue(user, AttributeName.ACTIVE, "false");
 		session.invalidate();
@@ -61,7 +60,6 @@ public class UserController {
 	}
 	
 	@DeleteMapping("/enable") 
-	@Logging(value = false) // For not logging the PASSWORD as it is a sensitive information!
 	public String enableUser(@RequestBody UserRequest userRequest) {
 		User user = userService.loadUserByUsername(userRequest.getUsername());
 		commonUtil.isOperationAllowed(user, Arrays.asList(Role.values()));

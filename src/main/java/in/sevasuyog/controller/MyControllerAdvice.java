@@ -32,7 +32,7 @@ public class MyControllerAdvice extends ResponseEntityExceptionHandler {
     
     @ExceptionHandler({ IllegalArgumentException.class })
     public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e, WebRequest request) {
-        return new ResponseEntity<Object>(
+    	return new ResponseEntity<Object>(
         	e.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST
         );
     }
