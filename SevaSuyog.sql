@@ -64,7 +64,7 @@ CREATE TABLE `attribute` (
   `DefaultValue` varchar(50) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `u_attribute` (`GUID`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -73,7 +73,7 @@ CREATE TABLE `attribute` (
 
 LOCK TABLES `attribute` WRITE;
 /*!40000 ALTER TABLE `attribute` DISABLE KEYS */;
-INSERT INTO `attribute` VALUES (1,'V','Is Verified','true/false','false'),(2,'AC','Is Active','true/false','true'),(3,'AV','Is Available','true/false','true');
+INSERT INTO `attribute` VALUES (1,'V','Is Verified','true/false','false'),(2,'AC','Is Active','true/false','true'),(3,'AV','Is Available','true/false','true'),(4,'B','Is Blocked','true/false','false');
 /*!40000 ALTER TABLE `attribute` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -163,7 +163,7 @@ CREATE TABLE `city` (
 
 LOCK TABLES `city` WRITE;
 /*!40000 ALTER TABLE `city` DISABLE KEYS */;
-INSERT INTO `city` VALUES (2,'barahiya',1,'brya'),(6,'barahiya iyas',1,'bri'),(7,'barahiya iyas',1,'brki'),(9,'barahiya iyas',1,'kris');
+INSERT INTO `city` VALUES (2,'barahiya',1,'brya'),(7,'barahiya iyas',1,'brki'),(9,'barahiya iyas',1,'kris');
 /*!40000 ALTER TABLE `city` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -380,6 +380,36 @@ LOCK TABLES `location` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `mysession`
+--
+
+DROP TABLE IF EXISTS `mysession`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mysession` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `SessionID` varchar(50) NOT NULL,
+  `UserId` bigint(20) NOT NULL,
+  `IsExpired` tinyint(1) NOT NULL DEFAULT 0,
+  `DeviceInfo` varchar(150) NOT NULL,
+  `DeviceHash` int(11) NOT NULL,
+  `UpdateTS` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`ID`),
+  KEY `userId` (`UserId`),
+  KEY `sessionId` (`SessionID`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mysession`
+--
+
+LOCK TABLES `mysession` WRITE;
+/*!40000 ALTER TABLE `mysession` DISABLE KEYS */;
+/*!40000 ALTER TABLE `mysession` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `objectalias`
 --
 
@@ -518,7 +548,6 @@ CREATE TABLE `spring_session` (
 
 LOCK TABLES `spring_session` WRITE;
 /*!40000 ALTER TABLE `spring_session` DISABLE KEYS */;
-INSERT INTO `spring_session` VALUES ('01280940-f5ab-4330-a2c7-7dfca307e2bc','2d7e75e7-4970-425d-9d87-33ae4de11d77',1616195751113,1616203793610,2592000,1618795793610,'sevasuyogswagger'),('04962b4c-da38-4ff5-86f0-a53212bbb0e5','35267102-2c73-43ca-bb49-8150735a260d',1616162032096,1616164488337,2592000,1618756488337,'sevasuyogswagger'),('3126c89c-7caa-44e0-b2bf-1e4f4bf07060','c85179e4-e796-45f3-b244-7d746a319fa0',1616465494920,1616506282026,2592000,1619098282026,'sevasuyogswagger'),('3480055c-f4ed-4d42-b4ee-d15d8b8275c2','b1f503bd-805c-46fd-b608-3dcb177d1f68',1615997925555,1615997925555,2592000,1618589925555,NULL),('92675515-e8e0-4c5f-8f3f-e40e7fd257b8','4cec6eb3-e55d-4915-b6c2-04c68dc4899d',1616291609351,1616292588358,2592000,1618884588358,'sevasuyogswagger'),('aafe4e4b-68d8-4c09-bd1f-d8ee5c5b9226','ea56518c-07b9-4f10-a13f-835382eb82a7',1616424750988,1616424750989,2592000,1619016750989,NULL),('b5f812bf-a980-4885-a407-f7d0738fa690','5660d904-9ad3-4c73-8d38-83c8c154d712',1615977126136,1615977126136,2592000,1618569126136,NULL),('f0f11732-5033-43e6-8d81-410b8fb70661','80652a61-ffca-4f2b-ab02-97cae0cf4bae',1616377565710,1616378058911,2592000,1618970058911,'sevasuyogswagger');
 /*!40000 ALTER TABLE `spring_session` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -544,7 +573,6 @@ CREATE TABLE `spring_session_attributes` (
 
 LOCK TABLES `spring_session_attributes` WRITE;
 /*!40000 ALTER TABLE `spring_session_attributes` DISABLE KEYS */;
-INSERT INTO `spring_session_attributes` VALUES ('01280940-f5ab-4330-a2c7-7dfca307e2bc','SPRING_SECURITY_CONTEXT','¨Ì\0sr\0=org.springframework.security.core.context.SecurityContextImpl\0\0\0\0\0\0\0L\0authenticationt\02Lorg/springframework/security/core/Authentication;xpsr\0Oorg.springframework.security.authentication.UsernamePasswordAuthenticationToken\0\0\0\0\0\0\0L\0credentialst\0Ljava/lang/Object;L\0	principalq\0~\0xr\0Gorg.springframework.security.authentication.AbstractAuthenticationToken”™(~nGd\0Z\0\rauthenticatedL\0authoritiest\0Ljava/util/Collection;L\0detailsq\0~\0xpsr\0&java.util.Collections$UnmodifiableList¸%1µÏé\0L\0listt\0Ljava/util/List;xr\0,java.util.Collections$UnmodifiableCollectionB\0ÄÀ^˜\0L\0cq\0~\0xpsr\0java.util.ArrayListxÅ“ô«aù\0I\0sizexp\0\0\0w\0\0\0sr\0Borg.springframework.security.core.authority.SimpleGrantedAuthority\0\0\0\0\0\0\0L\0rolet\0Ljava/lang/String;xpt\0Adminxq\0~\0\rsr\0Horg.springframework.security.web.authentication.WebAuthenticationDetails\0\0\0\0\0\0\0L\0\rremoteAddressq\0~\0L\0	sessionIdq\0~\0xpt\00:0:0:0:0:0:0:1ppsr\02org.springframework.security.core.userdetails.User\0\0\0\0\0\0\0Z\0accountNonExpiredZ\0accountNonLockedZ\0credentialsNonExpiredZ\0enabledL\0authoritiest\0Ljava/util/Set;L\0passwordq\0~\0L\0usernameq\0~\0xpsr\0%java.util.Collections$UnmodifiableSetÄí—èõÄU\0\0xq\0~\0\nsr\0java.util.TreeSet›òPìïÌá[\0\0xpsr\0Forg.springframework.security.core.userdetails.User$AuthorityComparator\0\0\0\0\0\0\0\0xpw\0\0\0q\0~\0xpt\0sevasuyogswagger'),('01280940-f5ab-4330-a2c7-7dfca307e2bc','UserID','¨Ì\0sr\0java.lang.Long;ã‰êÃè#ﬂ\0J\0valuexr\0java.lang.NumberÜ¨ïî‡ã\0\0xp\0\0\0\0\0\0\0'),('04962b4c-da38-4ff5-86f0-a53212bbb0e5','SPRING_SECURITY_CONTEXT','¨Ì\0sr\0=org.springframework.security.core.context.SecurityContextImpl\0\0\0\0\0\0\0L\0authenticationt\02Lorg/springframework/security/core/Authentication;xpsr\0Oorg.springframework.security.authentication.UsernamePasswordAuthenticationToken\0\0\0\0\0\0\0L\0credentialst\0Ljava/lang/Object;L\0	principalq\0~\0xr\0Gorg.springframework.security.authentication.AbstractAuthenticationToken”™(~nGd\0Z\0\rauthenticatedL\0authoritiest\0Ljava/util/Collection;L\0detailsq\0~\0xpsr\0&java.util.Collections$UnmodifiableList¸%1µÏé\0L\0listt\0Ljava/util/List;xr\0,java.util.Collections$UnmodifiableCollectionB\0ÄÀ^˜\0L\0cq\0~\0xpsr\0java.util.ArrayListxÅ“ô«aù\0I\0sizexp\0\0\0w\0\0\0sr\0Borg.springframework.security.core.authority.SimpleGrantedAuthority\0\0\0\0\0\0\0L\0rolet\0Ljava/lang/String;xpt\0Adminxq\0~\0\rsr\0Horg.springframework.security.web.authentication.WebAuthenticationDetails\0\0\0\0\0\0\0L\0\rremoteAddressq\0~\0L\0	sessionIdq\0~\0xpt\00:0:0:0:0:0:0:1ppsr\02org.springframework.security.core.userdetails.User\0\0\0\0\0\0\0Z\0accountNonExpiredZ\0accountNonLockedZ\0credentialsNonExpiredZ\0enabledL\0authoritiest\0Ljava/util/Set;L\0passwordq\0~\0L\0usernameq\0~\0xpsr\0%java.util.Collections$UnmodifiableSetÄí—èõÄU\0\0xq\0~\0\nsr\0java.util.TreeSet›òPìïÌá[\0\0xpsr\0Forg.springframework.security.core.userdetails.User$AuthorityComparator\0\0\0\0\0\0\0\0xpw\0\0\0q\0~\0xpt\0sevasuyogswagger'),('04962b4c-da38-4ff5-86f0-a53212bbb0e5','UserID','¨Ì\0sr\0java.lang.Long;ã‰êÃè#ﬂ\0J\0valuexr\0java.lang.NumberÜ¨ïî‡ã\0\0xp\0\0\0\0\0\0\0'),('3126c89c-7caa-44e0-b2bf-1e4f4bf07060','SPRING_SECURITY_CONTEXT','¨Ì\0sr\0=org.springframework.security.core.context.SecurityContextImpl\0\0\0\0\0\0\0L\0authenticationt\02Lorg/springframework/security/core/Authentication;xpsr\0Oorg.springframework.security.authentication.UsernamePasswordAuthenticationToken\0\0\0\0\0\0\0L\0credentialst\0Ljava/lang/Object;L\0	principalq\0~\0xr\0Gorg.springframework.security.authentication.AbstractAuthenticationToken”™(~nGd\0Z\0\rauthenticatedL\0authoritiest\0Ljava/util/Collection;L\0detailsq\0~\0xpsr\0&java.util.Collections$UnmodifiableList¸%1µÏé\0L\0listt\0Ljava/util/List;xr\0,java.util.Collections$UnmodifiableCollectionB\0ÄÀ^˜\0L\0cq\0~\0xpsr\0java.util.ArrayListxÅ“ô«aù\0I\0sizexp\0\0\0w\0\0\0sr\0Borg.springframework.security.core.authority.SimpleGrantedAuthority\0\0\0\0\0\0\0L\0rolet\0Ljava/lang/String;xpt\0Adminxq\0~\0\rsr\0Horg.springframework.security.web.authentication.WebAuthenticationDetails\0\0\0\0\0\0\0L\0\rremoteAddressq\0~\0L\0	sessionIdq\0~\0xpt\00:0:0:0:0:0:0:1ppsr\02org.springframework.security.core.userdetails.User\0\0\0\0\0\0\0Z\0accountNonExpiredZ\0accountNonLockedZ\0credentialsNonExpiredZ\0enabledL\0authoritiest\0Ljava/util/Set;L\0passwordq\0~\0L\0usernameq\0~\0xpsr\0%java.util.Collections$UnmodifiableSetÄí—èõÄU\0\0xq\0~\0\nsr\0java.util.TreeSet›òPìïÌá[\0\0xpsr\0Forg.springframework.security.core.userdetails.User$AuthorityComparator\0\0\0\0\0\0\0\0xpw\0\0\0q\0~\0xpt\0sevasuyogswagger'),('3126c89c-7caa-44e0-b2bf-1e4f4bf07060','UserID','¨Ì\0sr\0java.lang.Long;ã‰êÃè#ﬂ\0J\0valuexr\0java.lang.NumberÜ¨ïî‡ã\0\0xp\0\0\0\0\0\0\0'),('92675515-e8e0-4c5f-8f3f-e40e7fd257b8','SPRING_SECURITY_CONTEXT','¨Ì\0sr\0=org.springframework.security.core.context.SecurityContextImpl\0\0\0\0\0\0\0L\0authenticationt\02Lorg/springframework/security/core/Authentication;xpsr\0Oorg.springframework.security.authentication.UsernamePasswordAuthenticationToken\0\0\0\0\0\0\0L\0credentialst\0Ljava/lang/Object;L\0	principalq\0~\0xr\0Gorg.springframework.security.authentication.AbstractAuthenticationToken”™(~nGd\0Z\0\rauthenticatedL\0authoritiest\0Ljava/util/Collection;L\0detailsq\0~\0xpsr\0&java.util.Collections$UnmodifiableList¸%1µÏé\0L\0listt\0Ljava/util/List;xr\0,java.util.Collections$UnmodifiableCollectionB\0ÄÀ^˜\0L\0cq\0~\0xpsr\0java.util.ArrayListxÅ“ô«aù\0I\0sizexp\0\0\0w\0\0\0sr\0Borg.springframework.security.core.authority.SimpleGrantedAuthority\0\0\0\0\0\0\0L\0rolet\0Ljava/lang/String;xpt\0Adminxq\0~\0\rsr\0Horg.springframework.security.web.authentication.WebAuthenticationDetails\0\0\0\0\0\0\0L\0\rremoteAddressq\0~\0L\0	sessionIdq\0~\0xpt\00:0:0:0:0:0:0:1ppsr\02org.springframework.security.core.userdetails.User\0\0\0\0\0\0\0Z\0accountNonExpiredZ\0accountNonLockedZ\0credentialsNonExpiredZ\0enabledL\0authoritiest\0Ljava/util/Set;L\0passwordq\0~\0L\0usernameq\0~\0xpsr\0%java.util.Collections$UnmodifiableSetÄí—èõÄU\0\0xq\0~\0\nsr\0java.util.TreeSet›òPìïÌá[\0\0xpsr\0Forg.springframework.security.core.userdetails.User$AuthorityComparator\0\0\0\0\0\0\0\0xpw\0\0\0q\0~\0xpt\0sevasuyogswagger'),('92675515-e8e0-4c5f-8f3f-e40e7fd257b8','UserID','¨Ì\0sr\0java.lang.Long;ã‰êÃè#ﬂ\0J\0valuexr\0java.lang.NumberÜ¨ïî‡ã\0\0xp\0\0\0\0\0\0\0'),('b5f812bf-a980-4885-a407-f7d0738fa690','UserRole','¨Ì\0sr\0java.lang.Long;ã‰êÃè#ﬂ\0J\0valuexr\0java.lang.NumberÜ¨ïî‡ã\0\0xp\0\0\0\0\0\0\0'),('f0f11732-5033-43e6-8d81-410b8fb70661','SPRING_SECURITY_CONTEXT','¨Ì\0sr\0=org.springframework.security.core.context.SecurityContextImpl\0\0\0\0\0\0\0L\0authenticationt\02Lorg/springframework/security/core/Authentication;xpsr\0Oorg.springframework.security.authentication.UsernamePasswordAuthenticationToken\0\0\0\0\0\0\0L\0credentialst\0Ljava/lang/Object;L\0	principalq\0~\0xr\0Gorg.springframework.security.authentication.AbstractAuthenticationToken”™(~nGd\0Z\0\rauthenticatedL\0authoritiest\0Ljava/util/Collection;L\0detailsq\0~\0xpsr\0&java.util.Collections$UnmodifiableList¸%1µÏé\0L\0listt\0Ljava/util/List;xr\0,java.util.Collections$UnmodifiableCollectionB\0ÄÀ^˜\0L\0cq\0~\0xpsr\0java.util.ArrayListxÅ“ô«aù\0I\0sizexp\0\0\0w\0\0\0sr\0Borg.springframework.security.core.authority.SimpleGrantedAuthority\0\0\0\0\0\0\0L\0rolet\0Ljava/lang/String;xpt\0Adminxq\0~\0\rsr\0Horg.springframework.security.web.authentication.WebAuthenticationDetails\0\0\0\0\0\0\0L\0\rremoteAddressq\0~\0L\0	sessionIdq\0~\0xpt\00:0:0:0:0:0:0:1ppsr\02org.springframework.security.core.userdetails.User\0\0\0\0\0\0\0Z\0accountNonExpiredZ\0accountNonLockedZ\0credentialsNonExpiredZ\0enabledL\0authoritiest\0Ljava/util/Set;L\0passwordq\0~\0L\0usernameq\0~\0xpsr\0%java.util.Collections$UnmodifiableSetÄí—èõÄU\0\0xq\0~\0\nsr\0java.util.TreeSet›òPìïÌá[\0\0xpsr\0Forg.springframework.security.core.userdetails.User$AuthorityComparator\0\0\0\0\0\0\0\0xpw\0\0\0q\0~\0xpt\0sevasuyogswagger'),('f0f11732-5033-43e6-8d81-410b8fb70661','UserID','¨Ì\0sr\0java.lang.Long;ã‰êÃè#ﬂ\0J\0valuexr\0java.lang.NumberÜ¨ïî‡ã\0\0xp\0\0\0\0\0\0\0');
 /*!40000 ALTER TABLE `spring_session_attributes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -683,7 +711,7 @@ CREATE TABLE `user` (
   `Password` varchar(100) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `u_user` (`UserName`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -692,7 +720,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'jayram','$2a$10$eI2FmJJ0JjfACqcbTv3JG.ADgJgn6u9kkGY1GsTZWScle2B4u19PO');
+INSERT INTO `user` VALUES (1,'jayram','$2a$10$eI2FmJJ0JjfACqcbTv3JG.ADgJgn6u9kkGY1GsTZWScle2B4u19PO'),(2,'kishor','$2a$10$eI2FmJJ0JjfACqcbTv3JG.ADgJgn6u9kkGY1GsTZWScle2B4u19PO');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -713,7 +741,7 @@ CREATE TABLE `userattribute` (
   KEY `fk_userattribute_bhasha` (`AttributeID`),
   CONSTRAINT `fk_UserAttribute_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_userattribute_bhasha` FOREIGN KEY (`AttributeID`) REFERENCES `attribute` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -722,7 +750,7 @@ CREATE TABLE `userattribute` (
 
 LOCK TABLES `userattribute` WRITE;
 /*!40000 ALTER TABLE `userattribute` DISABLE KEYS */;
-INSERT INTO `userattribute` VALUES (1,1,1,'true');
+INSERT INTO `userattribute` VALUES (1,1,1,'true'),(2,2,4,'false'),(3,2,1,'true'),(4,1,4,'false');
 /*!40000 ALTER TABLE `userattribute` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -783,7 +811,7 @@ CREATE TABLE `userrole` (
 
 LOCK TABLES `userrole` WRITE;
 /*!40000 ALTER TABLE `userrole` DISABLE KEYS */;
-INSERT INTO `userrole` VALUES (2,1,'ADMIN','abc');
+INSERT INTO `userrole` VALUES (1,2,'ADMIN','xyz'),(2,1,'ADMIN','abc');
 /*!40000 ALTER TABLE `userrole` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -855,4 +883,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-23 19:09:11
+-- Dump completed on 2021-03-30 21:59:49
