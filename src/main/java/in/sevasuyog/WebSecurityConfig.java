@@ -7,14 +7,15 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import in.sevasuyog.controller.MyInterceptor;
 import in.sevasuyog.util.MyPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 	
 	@Autowired
 	private MyPasswordEncoder myPasswordEncoder;
@@ -26,9 +27,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 			.httpBasic();
         http.csrf().disable();
-        http.sessionManagement() 
-        	.maximumSessions(-1)
-        	.sessionRegistry(sessionRegistry());
     }
     
 	@Override
@@ -36,12 +34,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         String encryptedPassword = myPasswordEncoder.encode("seva@341@swag");
         auth.inMemoryAuthentication()
 			.withUser("sevasuyogswagger")
-			.password(encryptedPassword )
+			.password(encryptedPassword)
 			.authorities("Admin");
     }
 	
 	@Bean
-	public SessionRegistry sessionRegistry() {
-	    return new SessionRegistryImpl();
+	public MyInterceptor myInterceptor() {
+	    return new MyInterceptor();
+	}
+	
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+	    registry.addInterceptor(myInterceptor());
 	}
 }

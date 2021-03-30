@@ -38,7 +38,7 @@ public class AdminService {
 	public List<City> getCities(String stateGuid) {
 		Long stateId = commonDB.getIdFromGuid(stateGuid, IndianState.class);
 		if(stateId == null) return null;
-		return commonDB.fetchAll(City.class, Strings.INDIAN_STATE_ID, stateId);
+		return commonDB.fetchAll(Strings.INDIAN_STATE_ID, stateId, City.class);
 	}
 	
 	

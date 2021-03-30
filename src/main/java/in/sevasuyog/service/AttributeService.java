@@ -75,20 +75,23 @@ public class AttributeService {
 	}
 
 	public void setValue(User user, AttributeName attributeName, String value) {
-		Attribute attribute = null;
-		for(Attribute attr: attributes) {
-			if(attr.getGuid().equalsIgnoreCase(attributeName.getGUID())) {
-				attribute = attr;
-				break;
-			}
-		}
+		Attribute attribute = getAttribute(attributeName);
 		
 		for(UserAttribute userAttribute: user.getUserAttributes()) {
 			if(userAttribute.getAttributeId().longValue() == attribute.getId().longValue()) {
+				if(value == null || value.isBlank()) {
+					commonDB.delete(userAttribute);
+					return;
+				}
+				if(userAttribute.getAttributeValue().equalsIgnoreCase(value.trim())) return;
 				userAttribute.setAttributeValue(value.trim());
 				commonDB.update(userAttribute);
 				return;
 			}
+		}
+		
+		if(value == null || value.isBlank()) {
+			return;
 		}
 		
 		UserAttribute userAttribute = new UserAttribute();
@@ -96,5 +99,18 @@ public class AttributeService {
 		userAttribute.setAttributeId(attribute.getId());
 		userAttribute.setAttributeValue(value.trim());
 		commonDB.save(userAttribute);
+	}
+
+	private Attribute getAttribute(AttributeName attributeName) {
+		for(Attribute attr: attributes) {
+			if(attr.getGuid().equalsIgnoreCase(attributeName.getGUID())) {
+				return attr;
+			}
+		}
+		return null;
+	}
+
+	public void reset(User user, AttributeName active) {
+		setValue(user, active, null);
 	}
 }

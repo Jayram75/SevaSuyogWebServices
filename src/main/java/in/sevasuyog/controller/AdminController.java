@@ -9,8 +9,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +25,7 @@ import in.sevasuyog.model.Bhasha;
 import in.sevasuyog.model.City;
 import in.sevasuyog.model.Company;
 import in.sevasuyog.model.IndianState;
+import in.sevasuyog.model.MySession;
 import in.sevasuyog.model.User;
 import in.sevasuyog.model.enums.AttributeName;
 import in.sevasuyog.model.enums.ResponseMessage;
@@ -35,6 +34,7 @@ import in.sevasuyog.model.response.EntitiesResponse;
 import in.sevasuyog.service.AdminService;
 import in.sevasuyog.service.AttributeService;
 import in.sevasuyog.service.CommonService;
+import in.sevasuyog.service.SessionRegistry;
 import in.sevasuyog.service.UserService;
 import in.sevasuyog.util.CommonUtil;
 import in.sevasuyog.util.GetOperation;
@@ -69,24 +69,24 @@ public class AdminController {
 	@Autowired
 	public ObjectMapper objectMapper;
 	
-	@PostMapping("/disable") 
-	public String disableUser(
+	@PostMapping("/block") 
+	public String blockUser(
 			@Valid @RequestParam @NotBlank @Size(max = 50, min = 1) 
 			String username) {
 		commonUtil.isOperationAllowed(session);
 		User user = userService.loadUserByUsername(username);
-		attributeService.setValue(user, AttributeName.ACTIVE, "false");
+		attributeService.setValue(user, AttributeName.BLOCKED, "true");
 		logout(user);
 		return ResponseMessage.SUCCESSFUL.name();
 	}
 
-	@PostMapping("/enable") 
-	public String enableUser(
+	@PostMapping("/unblock") 
+	public String unblockUser(
 			@Valid @RequestParam @NotBlank @Size(max = 50, min = 1) 
 			String username) {
 		commonUtil.isOperationAllowed(session);
 		User user = userService.loadUserByUsername(username);
-		attributeService.setValue(user, AttributeName.ACTIVE, "true");
+		attributeService.setValue(user, AttributeName.BLOCKED, "false");
 		return ResponseMessage.SUCCESSFUL.name();
 	}
 	
@@ -242,9 +242,9 @@ public class AdminController {
 	}
 	
 	private void logout(User user) {
-		Collection<SessionInformation> usersSessions = sessionRegistry.getAllSessions(user.getId(), true);
-		usersSessions.forEach((temp) -> {
-			temp.expireNow();
+		Collection<MySession> usersSessions = sessionRegistry.getAllSessions(user.getId());
+		usersSessions.forEach((session) -> {
+			sessionRegistry.expireNow(session);
 	    });
 	}
 	

@@ -1,13 +1,13 @@
 package in.sevasuyog;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-
 import in.sevasuyog.service.AttributeService;
 
 @SpringBootApplication
@@ -24,4 +24,7 @@ public class Application {
 	public void init() {
 		attributeService.init();
 	}
+	
+	@PreDestroy
+	public void preDestroy() {}
 }

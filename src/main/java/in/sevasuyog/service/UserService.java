@@ -16,7 +16,7 @@ public class UserService {
 	private CommonDB commonDB;
 	
 	public User loadUserByUsername(String username) {
-		return commonDB.get(User.class, Strings.USERNAME, username);
+		return commonDB.get(Strings.USERNAME, username, User.class);
 	}
 
 	private User loadUserById(Long userId) {

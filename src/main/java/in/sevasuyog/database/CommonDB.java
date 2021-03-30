@@ -68,6 +68,7 @@ public class CommonDB {
 
 	@Transactional(readOnly = false)
 	public void delete(Object object) {
+		if(object == null) return;
 		sessionFactory.getCurrentSession().delete(object);
 	}
 	
@@ -102,7 +103,7 @@ public class CommonDB {
 	}
 
 	@Transactional(readOnly = true)
-	public <T> List<T> fetchAll(Class<T> type, String parameterName, Object value) {
+	public <T> List<T> fetchAll(String parameterName, Object value, Class<T> type) {
 		Query<T> q = sessionFactory.getCurrentSession().createQuery("select o from " + type.getSimpleName() + " o "
 				+ "where o." + parameterName + " = :parameter", type);
 		q.setParameter("parameter", value);
@@ -110,7 +111,7 @@ public class CommonDB {
 	}
 	
 	@Transactional(readOnly = true)
-	public <T> T get(Class<T> type, String parameterName, Object value) {
+	public <T> T get(String parameterName, Object value, Class<T> type) {
 		Query<T> q = sessionFactory.getCurrentSession().createQuery("select o from " + type.getSimpleName() + " o "
 				+ "where o." + parameterName + " = :parameter", type);
 		q.setParameter("parameter", value);
