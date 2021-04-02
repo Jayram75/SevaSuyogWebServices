@@ -64,7 +64,7 @@ CREATE TABLE `attribute` (
   `DefaultValue` varchar(50) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `u_attribute` (`GUID`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -390,14 +390,13 @@ CREATE TABLE `mysession` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `SessionID` varchar(50) NOT NULL,
   `UserId` bigint(20) NOT NULL,
-  `IsExpired` tinyint(1) NOT NULL DEFAULT 0,
   `DeviceInfo` varchar(150) NOT NULL,
   `DeviceHash` int(11) NOT NULL,
   `UpdateTS` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`ID`),
   KEY `userId` (`UserId`),
   KEY `sessionId` (`SessionID`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -883,4 +882,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-30 21:59:49
+-- Dump completed on 2021-04-02 17:23:55

@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.hibernate.type.StringType;
@@ -18,7 +20,8 @@ import in.sevasuyog.util.CommonUtil;
 
 @Service
 public class CommonDB {
-
+	private static Logger LOGGER = LogManager.getLogger(CommonDB.class);
+	
 	@Autowired
 	private SessionFactory sessionFactory;
 	
@@ -69,6 +72,7 @@ public class CommonDB {
 	@Transactional(readOnly = false)
 	public void delete(Object object) {
 		if(object == null) return;
+		LOGGER.info("An instance of " + object.getClass() + " deleted!");
 		sessionFactory.getCurrentSession().delete(object);
 	}
 	

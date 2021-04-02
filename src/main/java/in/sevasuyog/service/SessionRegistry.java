@@ -1,7 +1,6 @@
 package in.sevasuyog.service;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 
 import javax.servlet.http.HttpSession;
 
@@ -11,12 +10,11 @@ import org.springframework.stereotype.Service;
 import in.sevasuyog.database.CommonDB;
 import in.sevasuyog.database.UserDB;
 import in.sevasuyog.model.MySession;
+import in.sevasuyog.model.User;
 import in.sevasuyog.util.Strings;
 
 @Service
 public class SessionRegistry {
-	public static Integer maxInactiveInterval = null;
-	
 	@Autowired
 	private CommonDB commonDB;
 	
@@ -26,7 +24,7 @@ public class SessionRegistry {
 	public void registerNewSession(HttpSession httpSession, String deviceInfo) {
 		MySession session = getSession(httpSession.getId());
 		if(session != null) {
-			commonDB.delete(session);
+			expireNow(session);
 		}
 		session = new MySession(
 			httpSession.getId(), (Long)httpSession.getAttribute(Strings.USER_ID),
@@ -39,17 +37,14 @@ public class SessionRegistry {
 		return commonDB.get("sessionId", sessionId, MySession.class);
 	}
 
-	public Collection<MySession> getAllSessions(Long userId) {
-		return commonDB.fetchAll("userId", userId, MySession.class);
-	}
-
 	public void expireNow(MySession session) {
-		session.setIsExpired(true);
-		commonDB.update(session);
+		commonDB.delete(session);
 	}
 
-	public void deleteAllExpiredSessions(int maxInactiveIntervalInSeconds) {
-		long time = System.currentTimeMillis() - maxInactiveIntervalInSeconds*1000;
+	public void deleteAllExpiredSessions(long maxInactiveInterval) {
+		long currentMillis = System.currentTimeMillis();
+		long inactiveIntervalInMillis = maxInactiveInterval*1000;
+		long time = currentMillis - inactiveIntervalInMillis;
 		userDB.deleteAllExpiredSessions(new Timestamp(time));
 	}
 
@@ -60,5 +55,9 @@ public class SessionRegistry {
 	public void update(MySession mySession) {
 		mySession.setUpdateTS(new Timestamp(System.currentTimeMillis()));
 		commonDB.update(mySession);
+	}
+
+	public void expireNow(User user) {
+		expireNow(commonDB.get("userId", user.getId(), MySession.class));
 	}
 }

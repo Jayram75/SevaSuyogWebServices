@@ -9,36 +9,26 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import in.sevasuyog.database.CommonDB;
 import in.sevasuyog.model.MySession;
-import in.sevasuyog.service.ProcessServiceImpl;
 import in.sevasuyog.service.SessionRegistry;
 
 public class MyInterceptor implements HandlerInterceptor {
 	@Autowired
-	private CommonDB commonDB;
-	
-	@Autowired
 	private SessionRegistry sessionRegistry;
-	
-	@Autowired
-	private ProcessServiceImpl processServiceImpl;
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		HttpSession httpSession = request.getSession();
 		MySession mySession = sessionRegistry.getSession(httpSession.getId());
-		if(mySession == null || mySession.getIsExpired()) {
+		if(mySession == null) {
 			try {
 				httpSession.invalidate();
 			} catch (IllegalStateException e) {}	//Already logged out!
-			commonDB.delete(mySession);
 		} else {
 			sessionRegistry.update(mySession);
 		}
-		SessionRegistry.maxInactiveInterval = request.getSession().getMaxInactiveInterval();
-		processServiceImpl.process();
+		sessionRegistry.deleteAllExpiredSessions(request.getSession().getMaxInactiveInterval());
 		return true;
 	}
 

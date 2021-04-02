@@ -22,7 +22,6 @@ public class MySession {
 	private Long id;
 	private String sessionId;
 	private Long userId;
-	private Boolean isExpired;
 	private String deviceInfo;
 	private Integer deviceHash;
 	private Timestamp updateTS;
@@ -32,7 +31,6 @@ public class MySession {
 	public MySession(String sessionId, Long userId, String deviceInfo) {
 		this.sessionId = sessionId;
 		this.userId = userId;
-		this.isExpired = false;
 		this.deviceInfo = deviceInfo;
 		this.deviceHash = deviceInfo.hashCode();
 		this.updateTS = new Timestamp(System.currentTimeMillis());
@@ -44,14 +42,6 @@ public class MySession {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public Boolean getIsExpired() {
-		return isExpired;
-	}
-
-	public void setIsExpired(Boolean isExpired) {
-		this.isExpired = isExpired;
 	}
 
 	public String getSessionId() {

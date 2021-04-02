@@ -1,6 +1,5 @@
 package in.sevasuyog.controller;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -25,7 +24,6 @@ import in.sevasuyog.model.Bhasha;
 import in.sevasuyog.model.City;
 import in.sevasuyog.model.Company;
 import in.sevasuyog.model.IndianState;
-import in.sevasuyog.model.MySession;
 import in.sevasuyog.model.User;
 import in.sevasuyog.model.enums.AttributeName;
 import in.sevasuyog.model.enums.ResponseMessage;
@@ -242,10 +240,7 @@ public class AdminController {
 	}
 	
 	private void logout(User user) {
-		Collection<MySession> usersSessions = sessionRegistry.getAllSessions(user.getId());
-		usersSessions.forEach((session) -> {
-			sessionRegistry.expireNow(session);
-	    });
+		sessionRegistry.expireNow(user);
 	}
 	
 	class MyGetOperation<T> extends GetOperation<T> {
