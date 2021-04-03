@@ -23,7 +23,9 @@ import in.sevasuyog.model.Attribute;
 import in.sevasuyog.model.Bhasha;
 import in.sevasuyog.model.City;
 import in.sevasuyog.model.Company;
+import in.sevasuyog.model.FieldType;
 import in.sevasuyog.model.IndianState;
+import in.sevasuyog.model.Suggestion;
 import in.sevasuyog.model.User;
 import in.sevasuyog.model.enums.AttributeName;
 import in.sevasuyog.model.enums.ResponseMessage;
@@ -148,6 +150,20 @@ public class AdminController {
 		return response;
 	}
 	
+	@DeleteMapping("/fieldType") 
+	public String deleteFieldType(
+			@Valid @RequestParam @NotBlank @Size(max = 4, min = 1) 
+			String guid) {
+		return delete(guid, FieldType.class);	
+	}
+	
+	@DeleteMapping("/suggestion") 
+	public String deleteSuggestion(
+			@Valid @RequestParam @NotBlank @Size(max = 8, min = 1) 
+			String guid) {
+		return delete(guid, Suggestion.class);	
+	}
+	
 	/* ---- POST ---- */
 
 	@PostMapping("/city") 
@@ -178,6 +194,11 @@ public class AdminController {
 		String response = addOrUpdate(attributeRequest);
 		attributeService.refresh();
 		return response;
+	}
+	
+	@PostMapping("/fieldType") 
+	public String addOrUpdateFieldType(@RequestBody FieldType fieldType) {
+		return addOrUpdate(fieldType);
 	}
 	
 	/* ---- GET ---- */
@@ -214,6 +235,18 @@ public class AdminController {
 			}
 		}.getEntities(Attribute.class);
 	}
+	
+	@GetMapping("/fieldType") 
+	public EntitiesResponse<FieldType> getFieldTypes() {
+		return getEntities(FieldType.class);
+	}
+	
+	@GetMapping("/suggestion") 
+	public EntitiesResponse<Suggestion> getSuggestions() {
+		return getEntities(Suggestion.class);
+	}
+	
+	/* OTHERS */
 
 	@PostMapping("/refreshApp") 
 	public String refreshApp() {

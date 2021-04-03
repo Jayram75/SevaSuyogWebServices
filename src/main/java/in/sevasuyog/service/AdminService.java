@@ -40,6 +40,4 @@ public class AdminService {
 		if(stateId == null) return null;
 		return commonDB.fetchAll(Strings.INDIAN_STATE_ID, stateId, City.class);
 	}
-	
-	
 }
