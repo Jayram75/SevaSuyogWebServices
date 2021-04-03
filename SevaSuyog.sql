@@ -586,9 +586,10 @@ CREATE TABLE `suggestionbyuser` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
   `UserID` bigint(20) NOT NULL,
   `FieldValue` varchar(50) NOT NULL,
-  `IsResolved` tinyint(1) NOT NULL DEFAULT 0,
   `FieldTypeID` tinyint(4) NOT NULL,
+  `GUID` varchar(8) NOT NULL,
   PRIMARY KEY (`ID`),
+  UNIQUE KEY `u_suggestionbyuser` (`GUID`),
   KEY `fk_SuggestionByUser_user` (`UserID`),
   KEY `fk_suggestionbyuser_fieldtype` (`FieldTypeID`),
   CONSTRAINT `fk_SuggestionByUser_user` FOREIGN KEY (`UserID`) REFERENCES `user` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -882,4 +883,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-04-02 17:23:55
+-- Dump completed on 2021-04-03 18:45:12
