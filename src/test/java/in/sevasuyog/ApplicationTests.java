@@ -7,15 +7,15 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import in.sevasuyog.model.Greeting;
 import in.sevasuyog.util.CommonUtil;
-import in.sevasuyog.util.MyPasswordEncoder;
 
 @SpringBootTest
 class ApplicationTests {
 	@Autowired
-	private MyPasswordEncoder encoder;
+	private BCryptPasswordEncoder encoder;
 	
 	@Autowired
 	private CommonUtil commonUtil;

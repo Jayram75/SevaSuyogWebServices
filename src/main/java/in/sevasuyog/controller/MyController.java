@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +29,6 @@ import in.sevasuyog.service.AttributeService;
 import in.sevasuyog.service.SessionRegistry;
 import in.sevasuyog.service.UserService;
 import in.sevasuyog.util.CommonUtil;
-import in.sevasuyog.util.MyPasswordEncoder;
 import in.sevasuyog.util.Strings;
 import io.swagger.annotations.Api;
 import springfox.documentation.annotations.ApiIgnore;
@@ -47,7 +47,7 @@ public class MyController {
 	private UserService userService;
 	
 	@Autowired
-	private MyPasswordEncoder encoder;
+	private BCryptPasswordEncoder encoder;
 	
 	@Autowired
 	private AttributeService attributeService;
