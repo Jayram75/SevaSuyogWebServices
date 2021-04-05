@@ -15,21 +15,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 
 @Entity
-@Table(name = "City")
+@Table(name = "Locality")
 @DynamicUpdate(value = true)
-public class City {
+public class Locality {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonIgnore
 	@ApiModelProperty(hidden=true)
     private Long id;
 	private String guid;
-	private String city;
+	private String locality;
+	private String pinCode;
 	@JsonIgnore
-	private Long indianStateId;
+	private Long cityId;
 	@ManyToOne
-    @JoinColumn(name="IndianStateId", insertable = false, updatable = false)
-    private IndianState indianState;
+    @JoinColumn(name="CityID", insertable = false, updatable = false)
+    private City city;
 	
 	public Long getId() {
 		return id;
@@ -43,22 +44,28 @@ public class City {
 	public void setGuid(String guid) {
 		this.guid = guid;
 	}
-	public String getCity() {
+	public City getCity() {
 		return city;
 	}
-	public void setCity(String city) {
+	public void setCity(City city) {
 		this.city = city;
 	}
-	public Long getIndianStateId() {
-		return indianStateId;
+	public String getLocality() {
+		return locality;
 	}
-	public void setIndianStateId(Long indianStateId) {
-		this.indianStateId = indianStateId;
+	public void setLocality(String locality) {
+		this.locality = locality;
 	}
-	public IndianState getIndianState() {
-		return indianState;
+	public String getPinCode() {
+		return pinCode;
 	}
-	public void setIndianState(IndianState indianState) {
-		this.indianState = indianState;
+	public void setPinCode(String pinCode) {
+		this.pinCode = pinCode;
+	}
+	public Long getCityId() {
+		return cityId;
+	}
+	public void setCityId(Long cityId) {
+		this.cityId = cityId;
 	}
 }

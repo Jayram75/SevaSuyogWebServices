@@ -23,6 +23,6 @@ public class UserDB {
 		Query<?> query = sessionFactory.getCurrentSession().createQuery(hql);
 		query.setParameter("updateTS", timestamp);
 		int deletedSessionsCount = query.executeUpdate();
-		LOGGER.info(deletedSessionsCount + " sessions deleted!");
+		LOGGER.debug(deletedSessionsCount + " sessions deleted!");
 	}
 }

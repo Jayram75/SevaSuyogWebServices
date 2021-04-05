@@ -1,5 +1,7 @@
 package in.sevasuyog.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
@@ -11,7 +13,9 @@ import in.sevasuyog.database.CommonDB;
 import in.sevasuyog.model.FieldType;
 import in.sevasuyog.model.Suggestion;
 import in.sevasuyog.model.User;
+import in.sevasuyog.model.UserRole;
 import in.sevasuyog.model.enums.ResponseMessage;
+import in.sevasuyog.model.enums.Role;
 import in.sevasuyog.model.request.SuggestionRequest;
 import in.sevasuyog.util.Strings;
 
@@ -43,5 +47,38 @@ public class UserService {
 		);
 		suggestion.setGuid(UUID.randomUUID().toString().substring(0, 8));
 		commonDB.save(suggestion);
+	}
+	
+	public void assignRole(String username, Role role) {
+		User user = loadUserByUsername(username);
+		List<UserRole> userRoles = commonDB.fetchAll(Strings.USER_ID_FIELD, user.getId(), UserRole.class);
+		
+		for(UserRole ur: userRoles) {
+			if(ur.getRole() == role) return;
+		}
+		
+		UserRole userRole = new UserRole(user.getId(), role);
+		userRole.setGuid(UUID.randomUUID().toString().substring(0, 8));
+		commonDB.save(userRole);
+	}
+
+	public void revokeRole(String username, Role role) {
+		User user = loadUserByUsername(username);
+		List<UserRole> userRoles = commonDB.fetchAll(Strings.USER_ID_FIELD, user.getId(), UserRole.class);
+		
+		for(UserRole ur: userRoles) {
+			if(ur.getRole() == role) {
+				commonDB.delete(ur);
+				return;
+			}
+		}
+	}
+
+	public List<Role> getRoles(User user) {
+		List<Role> roles = new ArrayList<Role>();
+		for(UserRole ur: user.getUserRoles()) {
+			roles.add(ur.getRole());
+		}
+		return roles;
 	}
 }

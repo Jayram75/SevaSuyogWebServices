@@ -8,6 +8,11 @@ public class EntitiesResponse<T> {
 	private ResponseMessage message;
 	private List<T> entities;
 	
+	public EntitiesResponse() {}
+	public EntitiesResponse(List<T> entities) {
+		this.message = ResponseMessage.SUCCESSFUL;
+		this.entities = entities;
+	}
 	public ResponseMessage getMessage() {
 		return message;
 	}

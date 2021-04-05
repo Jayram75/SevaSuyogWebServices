@@ -44,4 +44,8 @@ public class LogUtil {
 	public void error(String string) {
 		LOGGER.error(string);
 	}
+
+	public void debug(String message, String methodName) {
+		LOGGER.debug("MethodName: " + methodName + " " + message);
+	}
 }

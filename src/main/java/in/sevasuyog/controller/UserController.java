@@ -25,7 +25,6 @@ import in.sevasuyog.service.CommonService;
 import in.sevasuyog.service.SessionRegistry;
 import in.sevasuyog.service.UserService;
 import in.sevasuyog.util.CommonUtil;
-import in.sevasuyog.util.GetOperation;
 import io.swagger.annotations.Api;
 
 @Logging
@@ -62,7 +61,14 @@ public class UserController {
 	
 	@GetMapping("/fieldType") 
 	public EntitiesResponse<FieldType> getFieldTypes() {
-		return getEntities(FieldType.class);
+		return getEntities(FieldType.class, Arrays.asList(Role.EMPLOYEE, Role.EMPLOYER, Role.ADMIN));
+	}
+	
+	@GetMapping("/role") 
+	public EntitiesResponse<Role> getRoles() {
+		User user = userService.getLoggedInUser(session);
+		commonUtil.isOperationAllowed(user, Arrays.asList(Role.values()));
+		return new EntitiesResponse<Role>(userService.getRoles(user));
 	}
 	
 	@PostMapping("/suggestion") 
@@ -76,17 +82,8 @@ public class UserController {
 	
 	/* OTHERS */
 	
-	private <T> EntitiesResponse<T> getEntities(Class<T> clazz) {
-		return new MyGetOperation<T>().getEntities(clazz);
-	}
-	
-	class MyGetOperation<T> extends GetOperation<T> {
-		public MyGetOperation() {
-			commonUtil.isOperationAllowed(session);
-		}
-		@Override
-		protected List<T> fetch(Class<T> clazz) {
-			return commonService.getObjectList(clazz);
-		}
+	private <T> EntitiesResponse<T> getEntities(Class<T> clazz, List<Role> roles) {
+		commonUtil.isOperationAllowed(session, roles);
+		return new EntitiesResponse<T>(commonService.getObjectList(clazz));
 	}
 }

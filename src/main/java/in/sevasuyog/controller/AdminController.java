@@ -1,10 +1,11 @@
 package in.sevasuyog.controller;
 
-import java.util.List;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,14 @@ import in.sevasuyog.model.City;
 import in.sevasuyog.model.Company;
 import in.sevasuyog.model.FieldType;
 import in.sevasuyog.model.IndianState;
+import in.sevasuyog.model.Locality;
 import in.sevasuyog.model.Suggestion;
 import in.sevasuyog.model.User;
 import in.sevasuyog.model.enums.AttributeName;
 import in.sevasuyog.model.enums.ResponseMessage;
+import in.sevasuyog.model.enums.Role;
 import in.sevasuyog.model.request.CityRequest;
+import in.sevasuyog.model.request.LocalityRequest;
 import in.sevasuyog.model.response.EntitiesResponse;
 import in.sevasuyog.service.AdminService;
 import in.sevasuyog.service.AttributeService;
@@ -37,7 +41,6 @@ import in.sevasuyog.service.CommonService;
 import in.sevasuyog.service.SessionRegistry;
 import in.sevasuyog.service.UserService;
 import in.sevasuyog.util.CommonUtil;
-import in.sevasuyog.util.GetOperation;
 import io.swagger.annotations.Api;
 
 @Logging
@@ -108,6 +111,38 @@ public class AdminController {
 		User user = userService.loadUserByUsername(username);
 		attributeService.setValue(user, AttributeName.VERIFIED, "false");
 		logout(user);
+		return ResponseMessage.SUCCESSFUL.name();
+	}
+	
+	/* ROLE */
+	
+	@GetMapping("/role")
+	public EntitiesResponse<Role> getRoles() {
+		commonUtil.isOperationAllowed(session);
+		return new EntitiesResponse<Role>(Arrays.asList(Role.values()));
+	}
+	
+	@PostMapping("/assignRole")
+	public String assignRole(
+			@Valid @RequestParam @NotBlank @Size(max = 50, min = 1) 
+			String username,
+			@Valid @RequestParam @NotNull
+			Role role
+			) {
+		commonUtil.isOperationAllowed(session);
+		userService.assignRole(username, role);
+		return ResponseMessage.SUCCESSFUL.name();
+	}
+	
+	@PostMapping("/revokeRole")
+	public String revokeRole(
+			@Valid @RequestParam @NotBlank @Size(max = 50, min = 1) 
+			String username,
+			@Valid @RequestParam @NotNull 
+			Role role
+			) {
+		commonUtil.isOperationAllowed(session);
+		userService.revokeRole(username, role);
 		return ResponseMessage.SUCCESSFUL.name();
 	}
 	
@@ -205,11 +240,8 @@ public class AdminController {
 	
 	@GetMapping("/city") 
 	public EntitiesResponse<City> getCities(@RequestParam String stateGuid) {
-		return new MyGetOperation<City>() {
-			@Override protected List<City> fetch(Class<City> clazz) {
-				return adminService.getCities(stateGuid);
-			}
-		}.getEntities(City.class);
+		commonUtil.isOperationAllowed(session);
+		return new EntitiesResponse<City>(adminService.getCities(stateGuid));
 	}
 	
 	@GetMapping("/state") 
@@ -229,11 +261,8 @@ public class AdminController {
 	
 	@GetMapping("/attribute") 
 	public EntitiesResponse<Attribute> getAttributes() {
-		return new MyGetOperation<Attribute>() {
-			@Override protected List<Attribute> fetch(Class<Attribute> clazz) {
-				return attributeService.getAttributes();
-			}
-		}.getEntities(Attribute.class);
+		commonUtil.isOperationAllowed(session);
+		return new EntitiesResponse<Attribute>(attributeService.getAttributes());
 	}
 	
 	@GetMapping("/fieldType") 
@@ -244,6 +273,29 @@ public class AdminController {
 	@GetMapping("/suggestion") 
 	public EntitiesResponse<Suggestion> getSuggestions() {
 		return getEntities(Suggestion.class);
+	}
+	
+	/* Locality */
+	
+	@DeleteMapping("/locality") 
+	public String deleteLocality(
+			@Valid @RequestParam @NotBlank @Size(max = 4, min = 1) 
+			String guid) {
+		return delete(guid, Locality.class);	
+	}
+	
+	@PostMapping("/locality") 
+	public String addOrUpdateLocality(@RequestBody LocalityRequest localityRequest) {
+		commonUtil.isOperationAllowed(session);
+		commonUtil.validate(localityRequest);
+		adminService.addOrUpdateLocality(localityRequest);
+		return ResponseMessage.SUCCESSFUL.name();
+	}
+	
+	@GetMapping("/locality") 
+	public EntitiesResponse<Locality> getLocalities(@RequestParam String cityGuid) {
+		commonUtil.isOperationAllowed(session);
+		return new EntitiesResponse<Locality>(adminService.getLocalities(cityGuid));
 	}
 	
 	/* OTHERS */
@@ -269,21 +321,12 @@ public class AdminController {
 	}
 	
 	private <T> EntitiesResponse<T> getEntities(Class<T> clazz) {
-		return new MyGetOperation<T>().getEntities(clazz);
+		commonUtil.isOperationAllowed(session);
+		return new EntitiesResponse<T>(commonService.getObjectList(clazz));
 	}
 	
 	private void logout(User user) {
 		sessionRegistry.expireNow(user);
-	}
-	
-	class MyGetOperation<T> extends GetOperation<T> {
-		public MyGetOperation() {
-			commonUtil.isOperationAllowed(session);
-		}
-		@Override
-		protected List<T> fetch(Class<T> clazz) {
-			return commonService.getObjectList(clazz);
-		}
 	}
 }
 

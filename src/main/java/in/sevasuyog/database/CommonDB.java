@@ -36,7 +36,6 @@ public class CommonDB {
 	@Transactional(readOnly = false)
 	public void save(Object object) {
 		sessionFactory.getCurrentSession().save(object);
-
 	}
 
 	@Transactional(readOnly = false)
@@ -72,7 +71,7 @@ public class CommonDB {
 	@Transactional(readOnly = false)
 	public void delete(Object object) {
 		if(object == null) return;
-		LOGGER.info("An instance of " + object.getClass() + " deleted!");
+		LOGGER.debug("An instance of " + object.getClass() + " deleted!");
 		sessionFactory.getCurrentSession().delete(object);
 	}
 	

@@ -32,6 +32,11 @@ public class UserRole {
     @JoinColumn(name="UserID", insertable = false, updatable = false)
     private User user;
 	
+	public UserRole() {}
+	public UserRole(Long userId, Role role) {
+		this.userId = userId;
+		this.role = role;
+	}
 	public Long getId() {
 		return id;
 	}

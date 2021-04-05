@@ -81,6 +81,6 @@ public class LoggingAspect {
 		
 		String methodName = obj.getClass().getName().split("\\$")[0] + "." + method.getName();
 		String message = objectMapper.writeValueAsString(args);
-		logUtil.info(message, methodName);
+		logUtil.debug(message, methodName);
 	}
 }
